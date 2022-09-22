@@ -1,0 +1,56 @@
+[
+  {
+    "model": "products.category",
+    "pk": 1,
+    "fields": {
+      "name": "Fresh Fruit 100%",
+      "image": "cat-1.jpg",
+      "description": "Tasty fruit on the fridge"
+    }
+  },
+  {
+    "model": "products.category",
+    "pk": 2,
+    "fields": {
+      "name": "Dry Fruit (do NOT wet)",
+      "image": "media/cat-2.jpg",
+      "description": "Dry Fruit under the fridge"
+    }
+  },
+  {
+    "model": "products.category",
+    "pk": 3,
+    "fields": {
+      "name": "Vegetables (Just Like You)",
+      "image": "media/cat-3.jpg",
+      "description": "That's that"
+    }
+  },
+  {
+    "model": "products.category",
+    "pk": 4,
+    "fields": {
+      "name": "Juice with Pulp",
+      "image": "media/cat-4.jpg",
+      "description": "With Fictitious Pulp!"
+    }
+  },
+  {
+    "model": "products.category",
+    "pk": 5,
+    "fields": {
+      "name": "Ha-ha, Fresh Meat!",
+      "image": "media/cat-5.jpg",
+      "description": "Chin-choppa, chin-choppa"
+    }
+  },
+  {
+    "model": "products.category",
+    "pk": 6,
+    "fields": {
+      "name": "Energy Drinks",
+      "image": "media/cat-6.png",
+      "description": "Energy Drinks for your apathetic ass"
+    }
+  }
+]

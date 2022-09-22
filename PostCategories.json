@@ -1,0 +1,18 @@
+[
+  {
+    "model": "posts.postcategory",
+    "pk": 1,
+    "fields": {
+      "name": "What you know about rolling down in the deep?",
+      "description": "You can call that mental freak"
+    }
+  },
+  {
+    "model": "posts.postcategory",
+    "pk": 2,
+    "fields": {
+      "name": "Some pulp fiction",
+      "description": "Makulatura"
+    }
+  }
+]
