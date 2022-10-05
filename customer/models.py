@@ -1,12 +1,11 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
-
+from products.models import Product
 
 
 class User(AbstractUser):
-    username = models.CharField(default=False,blank=False, max_length=100, unique=True)
+    username = models.CharField(default=False, blank=False, max_length=100, unique=True)
     email = models.EmailField(default=False, blank=False)
     phone = models.CharField(max_length=12)
 
@@ -17,5 +16,52 @@ class User(AbstractUser):
         return self.username
 
 
-class Cart(models.Model):
-    customer_name = models.CharField('Customer name', max_length=200)
+class Order(models.Model):
+    customer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    date_ordered = models.DateTimeField(auto_now_add=True)
+    completed = models.BooleanField(default=False)
+    session = models.ForeignKey(to='sessions.Session', on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return str(self.id)
+
+    @property
+    def get_cart_total(self):
+        order_items = self.orderitem_set.all()
+        total = sum([item.get_total for item in order_items])
+        return "{:.2f}".format(total)
+
+    @property
+    def get_cart_items(self):
+        order_items = self.orderitem_set.all()
+        total = sum([item.quantity for item in order_items])
+        return total
+
+
+class OrderItem(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField(default=0, null=True, blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.product}, {self.order}'
+
+    @property
+    def get_total(self):
+        product_price = self.product.discount_price if self.product.discount else self.product.price
+        total = product_price * self.quantity
+        return total
+
+
+class ShippingAddress(models.Model):
+    customer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    address = models.CharField(max_length=200, null=False)
+    city = models.CharField(max_length=200, null=False)
+    state = models.CharField(max_length=200, null=False)
+    zipcode = models.CharField(max_length=200, null=False)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.address

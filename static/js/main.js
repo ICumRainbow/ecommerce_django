@@ -178,6 +178,21 @@
     /*-----------------------
 		Price Range Slider
 	------------------------ */
+	function GetURLParameter(sParam)
+    {
+        var sPageURL = window.location.search.substring(1);
+        var sURLVariables = sPageURL.split('&');
+        for (var i = 0; i < sURLVariables.length; i++)
+        {
+            var sParameterName = sURLVariables[i].split('=');
+            if (sParameterName[0] == sParam)
+            {
+                return sParameterName[1];
+            }
+        }
+    }
+    var price__gt = GetURLParameter('price__gt')
+    var price__lt = GetURLParameter('price__lt')
     var rangeSlider = $(".price-range"),
         minamount = $("#minamount"),
         maxamount = $("#maxamount"),
@@ -185,16 +200,17 @@
         maxPrice = rangeSlider.data('max');
     rangeSlider.slider({
         range: true,
+        step: 1,
         min: minPrice,
         max: maxPrice,
-        values: [minPrice, maxPrice],
+        values: [price__gt !== undefined ? parseInt(price__gt) : minPrice, price__lt !== undefined ? parseInt(price__lt) : maxPrice],
         slide: function (event, ui) {
             minamount.val(ui.values[0]);
             maxamount.val(ui.values[1]);
         }
     });
-    minamount.val('$' + rangeSlider.slider("values", 0));
-    maxamount.val('$' + rangeSlider.slider("values", 1));
+    minamount.val(rangeSlider.slider("values", 0));
+    maxamount.val(rangeSlider.slider("values", 1));
 
     /*--------------------------
         Select
@@ -219,8 +235,6 @@
 		Quantity change
 	--------------------- */
     var proQty = $('.pro-qty');
-    proQty.prepend('<span class="dec qtybtn">-</span>');
-    proQty.append('<span class="inc qtybtn">+</span>');
     proQty.on('click', '.qtybtn', function () {
         var $button = $(this);
         var oldValue = $button.parent().find('input').val();

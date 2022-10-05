@@ -32,3 +32,7 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def discount_price(self) -> float:
+        return round(self.price * (100 - self.discount_rate) / 100, 2)

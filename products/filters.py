@@ -1,23 +1,23 @@
-import django_filters
+from django_filters import NumberFilter, FilterSet
 from django.db.models import Max, Min
-from django import forms
-from django.forms import CharField, ModelForm
-from django_filters import FilterSet, AllValuesFilter, RangeFilter
-from django.forms.widgets import HiddenInput
-from django_filters.widgets import RangeWidget
+from django.forms import CharField
 
 from products.models import Product
 
 
-class ProductFilter(ModelForm):
+class ProductFilter(FilterSet):
+    price = Product.objects.all().aggregate(Min('price'), Max('price'))
+    name = CharField()
+    price_min = price['price__min']
+    price_max = price['price__max']
+    price__gt = NumberFilter(field_name='price', lookup_expr='gte')
+    price__lt = NumberFilter(field_name='price', lookup_expr='lte')
 
     class Meta:
         model = Product
         fields = [
             'category',
-            'price',
+            'name',
+            'price__gt',
+            'price__lt',
         ]
-        widgets = {
-            'price': forms.TextInput(attrs={'type': 'range'})
-        }
-
