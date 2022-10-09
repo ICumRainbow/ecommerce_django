@@ -5,7 +5,7 @@ from products.models import Product
 
 
 class User(AbstractUser):
-    username = models.CharField(default=False, blank=False, max_length=100, unique=True)
+    username = models.CharField(blank=False, max_length=100, unique=True)
     email = models.EmailField(default=False, blank=False)
     phone = models.CharField(max_length=12)
 
@@ -18,27 +18,27 @@ class User(AbstractUser):
 
 class Order(models.Model):
     customer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    date_ordered = models.DateTimeField(auto_now_add=True)
-    completed = models.BooleanField(default=False)
-    session = models.ForeignKey(to='sessions.Session', on_delete=models.SET_NULL, null=True)
+    date_ordered = models.DateTimeField('Date ordered', auto_now_add=True)
+    completed = models.BooleanField('Completed', default=False)
+    session = models.ForeignKey(to='sessions.Session', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return str(self.id)
 
     @property
     def get_cart_total(self):
-        order_items = self.orderitem_set.all()
+        order_items = self.orderitems_set.all()
         total = sum([item.get_total for item in order_items])
         return "{:.2f}".format(total)
 
     @property
     def get_cart_items(self):
-        order_items = self.orderitem_set.all()
+        order_items = self.orderitems_set.all()
         total = sum([item.quantity for item in order_items])
         return total
 
 
-class OrderItem(models.Model):
+class OrderItems(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(default=0, null=True, blank=True)
@@ -54,14 +54,30 @@ class OrderItem(models.Model):
         return total
 
 
-class ShippingAddress(models.Model):
+class LikedProducts(models.Model):
+    class Meta:
+        verbose_name_plural = 'Liked Products'
+    customer = models.ForeignKey(to=User, on_delete=models.CASCADE, null=True)
+    session = models.ForeignKey(to='sessions.Session', on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(to=Product, on_delete=models.CASCADE, null=False)
+
+
+class ShippingDetails(models.Model):
+    class Meta:
+        verbose_name_plural = 'Shipping Details'
+
+    class PaymentType(models.IntegerChoices):
+        PAYME = 1, 'PayMe'
+        CLICK = 2, 'Click'
+
     customer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
     address = models.CharField(max_length=200, null=False)
     city = models.CharField(max_length=200, null=False)
     state = models.CharField(max_length=200, null=False)
     zipcode = models.CharField(max_length=200, null=False)
+    payment_type = models.SmallIntegerField(choices=PaymentType.choices)
     date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.address
+        return f'{self.customer.username} - {self.order_id}'

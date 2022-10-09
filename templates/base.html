@@ -35,7 +35,13 @@
 <div id="preloder">
     <div class="loader"></div>
 </div>
-
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-warning alert-dismissible fade show position-absolute" id="message" role="alert">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
 <!-- Humberger Begin -->
 <div class="humberger__menu__overlay"></div>
 <div class="humberger__menu__wrapper">
@@ -44,7 +50,7 @@
     </div>
     <div class="humberger__menu__cart">
         <ul>
-            <li><a href="#"><i class="fa fa-heart"></i> <span>1</span></a></li>
+            <li><a href="#"><i class="fa fa-heart"></i> <span>{{ liked_products }}</span></a></li>
             <li><a href="#"><i class="fa fa-shopping-bag"></i> <span>{{ cart_items }}</span></a></li>
         </ul>
         <div class="header__cart__price">Total: <span>${{ order.get_cart_total }}</span></div>
@@ -166,7 +172,7 @@
             <div class="col-lg-3">
                 <div class="header__cart">
                     <ul>
-                        <li><a href="#"><i class="fa fa-heart"></i> <span>1</span></a></li>
+                        <li><a href="#"><i class="fa fa-heart"></i> <span>{{ liked_products }}</span></a></li>
                         <li><a href="{% url 'cart' %}"><i class="fa fa-shopping-bag"></i> <span>{{ cart_items }}</span></a></li>
                     </ul>
                     <div class="header__cart__price">Total: <span>${{ order.get_cart_total }}</span></div>
@@ -225,6 +231,8 @@
                             </div>
                         </div>
                     </div>
+
+
                         {% if request.path == "/" %}
                             <div class="hero__item set-bg" data-setbg="{% static 'img/hero/banner.jpg' %}">
                                 <div class="hero__text">
@@ -239,6 +247,7 @@
             </div>
         </div>
     </section>
+
     <!-- Hero Section End -->
 
 {% block content %}{% endblock %}
@@ -326,6 +335,8 @@
 <script src="{% static 'js/owl.carousel.min.js' %}"></script>
 <script src="{% static 'js/main.js' %}"></script>
 <script src="{% static 'js/cart.js' %}"></script>
+<script src="{% static 'js/like.js' %}"></script>
+<script src="{% static 'js/script.js' %}"></script>
 
 </body>
 </html>

@@ -1,6 +1,7 @@
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
 
-from .models import User
+from .models import User, ShippingDetails
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -9,7 +10,15 @@ class CustomUserCreationForm(UserCreationForm):
         fields = ('username', 'first_name', 'last_name', 'email', 'phone')
 
 
-class CustomUserChangeForm(UserChangeForm):
+# class CustomUserChangeForm(UserChangeForm):
+#     class Meta:
+#         model = User
+#         fields = ('username', 'first_name', 'last_name', 'email', 'phone')
+
+class CheckoutForm(forms.ModelForm):
+    customer_id = forms.CharField(required=False, disabled=True)
+    order_id = forms.CharField(required=False, disabled=True)
+
     class Meta:
-        model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'phone')
+        model = ShippingDetails
+        fields = ('address', 'city', 'state', 'zipcode', 'payment_type')

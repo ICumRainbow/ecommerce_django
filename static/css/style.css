@@ -111,6 +111,10 @@ ol {
   Helper CSS
 -----------------------*/
 
+.login_form{
+	margin-left: auto;
+}
+
 .section-title {
 	margin-bottom: 50px;
 	text-align: center;
@@ -591,6 +595,12 @@ ol {
 	padding-left: 40px;
 	padding-top: 10px;
 	padding-bottom: 12px;
+}
+#message{
+	opacity: 80%;
+	left: 35%;
+	right: 35%;
+	top: 3%;
 }
 
 /*.hero.hero-normal .hero__search {*/
@@ -1844,6 +1854,10 @@ ol {
 	display: inline-block;
 }
 
+.qtybtn{
+	cursor: pointer;
+}
+
 .product__details__tab {
 	padding-top: 85px;
 }
@@ -2147,8 +2161,16 @@ ol {
 	margin-bottom: 25px;
 }
 
-.checkout__form p {
+.account__register {
+	text-align: center;
 	column-rule: #b2b2b2;
+}
+
+.checkout__form p a{
+	color: #1c1c1c;
+}
+.checkout__form p a:hover{
+	color: #7fad39;
 }
 
 .checkout__input {
@@ -2196,7 +2218,8 @@ ol {
 
 .checkout__input__checkbox label input {
 	position: absolute;
-	visibility: hidden;
+	left: 0;
+	top: 5px;
 }
 
 .checkout__input__checkbox label input:checked~.checkmark {
@@ -2993,6 +3016,10 @@ ol {
 /* Tablet Device = 768px */
 
 @media only screen and (min-width: 768px) and (max-width: 991px) {
+	.login_form{
+		margin-left: auto;
+		margin-right: auto;
+	}
 	.hero__categories {
 		margin-bottom: 30px;
 	}
@@ -3219,6 +3246,16 @@ ol {
 /* Wide Mobile = 480px */
 
 @media only screen and (max-width: 767px) {
+	#message{
+		opacity: 80%;
+		left: 35%;
+		right: 20%;
+		top: 0;
+	}
+	.login_form{
+		margin-left: auto;
+		margin-right: auto;
+	}
 	.hero__categories {
 		margin-bottom: 30px;
 	}

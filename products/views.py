@@ -1,5 +1,7 @@
 import json
 
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -9,8 +11,9 @@ from math import ceil
 from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import csrf_exempt
 
+from customer.forms import CheckoutForm
 from posts.models import Post
-from customer.models import Order, OrderItem
+from customer.models import Order, OrderItems, ShippingDetails, LikedProducts
 from products.models import Product
 from .filters import ProductFilter
 
@@ -30,11 +33,15 @@ def product_details(request, id):
     product = Product.objects.get(id=id)
     related_products = Product.objects.filter(category=product.category).exclude(id=id)
     customer = request.user.id
-    order, created = Order.objects.get_or_create(customer=customer, completed=False, session_id=request.session.session_key)
+    session_id = request.session.session_key
+    if request.user.is_authenticated:
+        order, created = Order.objects.get_or_create(customer_id=customer, completed=False)
+    else:
+        order, created = Order.objects.get_or_create(session_id=session_id, completed=False)
 
     try:
-        order_item = order.orderitem_set.get(product__id=id)
-    except OrderItem.DoesNotExist:
+        order_item = order.orderitems_set.get(product__id=id)
+    except OrderItems.DoesNotExist:
         quantity = 0
     else:
         quantity = order_item.quantity
@@ -80,12 +87,39 @@ def shop_grid(request):
     return render(request, 'shop-grid.html', context)
 
 
-def checkout(request):
-    return render(request, 'checkout.html')
+@login_required(login_url='login')
+def checkout_view(request):
+    payment_type_mapping = {
+        'click': ShippingDetails.PaymentType.CLICK,
+        'payme': ShippingDetails.PaymentType.PAYME
+    }
+
+    order = Order.objects.get(customer=request.user, session_id=request.session.session_key, completed=False)
+    order_items = OrderItems.objects.filter(order=order)
+    checkout_form = CheckoutForm(request.POST)
+
+    context = {
+        'checkout_form': checkout_form,
+    }
+    if request.method == 'POST':
+        if not order_items:
+            messages.success(request, 'You have no items in your cart!')
+            return render(request, 'checkout.html', context)
+        if checkout_form.is_valid():
+            checkout: ShippingDetails = checkout_form.save(commit=False)
+            checkout.customer_id = request.user.id
+            checkout.order = order
+            checkout.save()
+            order.completed = True
+            order.save()
+        else:
+            print(checkout_form.errors.as_data)
+            print('FUCK YOU')
+    return render(request, 'checkout.html', context)
 
 
 @csrf_exempt
-def update_item(request):
+def update_item_view(request):
     data = json.loads(request.body)
     product_id = data['productId']
     action = data['action']
@@ -93,10 +127,12 @@ def update_item(request):
     customer = request.user.id
     product = Product.objects.get(id=product_id)
     session_id = request.session.session_key
+    if request.user.is_authenticated:
+        order, created = Order.objects.get_or_create(customer_id=customer, completed=False)
+    else:
+        order, created = Order.objects.get_or_create(session_id=session_id, completed=False)
 
-    order, created = Order.objects.get_or_create(customer=customer, completed=False, session_id=session_id)
-
-    order_item, created = OrderItem.objects.get_or_create(order=order, product=product)
+    order_item, created = OrderItems.objects.get_or_create(order=order, product=product)
 
     if action == 'add':
         order_item.quantity += 1
@@ -115,6 +151,35 @@ def update_item(request):
         order.save()
         return JsonResponse({'result': 'Success!'}, status=200)
 
+    else:
+        return JsonResponse({'detail': f'Unknown action {action}'}, status=400)
+
+
+@csrf_exempt
+def like_item_view(request):
+    data = json.loads(request.body)
+    product_id = data['productId']
+    action = data['action']
+
+    customer = request.user.id
+    product = Product.objects.get(id=product_id)
+    session_id = request.session.session_key
+
+    if action == 'like':
+        if request.user.is_authenticated:
+            liked_products = LikedProducts.objects.filter(customer_id=customer, product=product)
+            if not liked_products:
+                liked_products.create(customer_id=customer, product=product)
+            else:
+                liked_products.delete()
+            return JsonResponse({'result': 'Success!'}, status=200)
+        else:
+            liked_products = LikedProducts.objects.filter(session_id=session_id, product=product)
+            if not liked_products:
+                liked_products.create(session_id=session_id, product=product)
+            else:
+                liked_products.delete()
+            return JsonResponse({'result': 'Success!'}, status=200)
     else:
         return JsonResponse({'detail': f'Unknown action {action}'}, status=400)
 

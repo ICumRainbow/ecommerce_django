@@ -3,71 +3,67 @@
 {% load static %}
 <body>
 {% block content %}
-    <!-- Breadcrumb Section Begin -->
-    <section class="breadcrumb-section set-bg" data-setbg="{% static 'img/breadcrumb.jpg' %}">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <div class="breadcrumb__text">
-                        <h2>Login</h2>
-                        <div class="breadcrumb__option">
-                            <a href="">Home</a>
-                            <span>Login</span>
-                        </div>
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-section set-bg" data-setbg="{% static 'img/breadcrumb.jpg' %}">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="breadcrumb__text">
+                    <h2>Login</h2>
+                    <div class="breadcrumb__option">
+                        <a href="">Home</a>
+                        <span>Login</span>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-    <!-- Breadcrumb Section End -->
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
 
-    <!-- Checkout Section Begin -->
-    <section class="checkout spad">
-        <div class="container">
-            <div class="checkout__form">
-                <h4 class="text-center">User Details</h4>
- {% if form.errors %}
-    {% for field in form %}
-        {% for error in field.errors %}
-            <p> {{ error }} </p>
-        {% endfor %}
-    {% endfor %}
-{% endif %}
-                {% if messages %}
-                    {% for message in messages %}
-                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        {{ message }}
-                    </div>
-
+<!-- Checkout Section Begin -->
+<section class="checkout spad">
+    <div class="container">
+        <div class="checkout__form">
+            <h4 class="text-center">User Details</h4>
+            {% if form.errors %}
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <p> {{ error }} </p>
                     {% endfor %}
+                {% endfor %}
+            {% endif %}
 
-                {% endif %}
-                <form action="{% url 'login' %}" method=POST>
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-lg-8 col-md-6 mx-auto">
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="checkout__input">
-                                        <p>Username<span>*</span></p>
-                                    <input type="text" class="form-control" name="username">
-                                    </div>
+            <p class="account__register">Don't have an account yet? Click <a href="{% url 'register' %}">register</a> to
+                create one! Items in your cart will not get lost!</p>
+            <form action="{% url 'login' %}" method=POST>
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-lg-8 col-sm-6 login_form">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="checkout__input">
+                                    <label for="username">Username</label>
+                                    <input id="username" type="text" class="form-control" name="username">
                                 </div>
-                            <div class="row">
-                                <div class="checkout__input col-lg-6">
-                                    <p>Password<span>*</span></p>
-                                    <input type="password" class="form-control" name="password">
-                                </div>
-                            <input type="submit" value="Submit" class="btn">
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="checkout__input">
+                                    <label for="password">Password</label>
+                                    <input id="password" type="password" class="form-control" name="password">
+                                </div>
+                            </div>
+                        </div>
+                        <input type="submit" value="Submit" class="btn site-btn">
                     </div>
                 </div>
-                </form>
-            </div>
+            </form>
         </div>
-    </section>
-    <!-- Checkout Section End -->
+    </div>
+</section>
+<!-- Checkout Section End -->
 {% endblock %}
 
 </body>

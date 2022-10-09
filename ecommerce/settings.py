@@ -72,6 +72,7 @@ TEMPLATES = [
                 'core.context_processors.retrieve_cart_items',
                 'core.context_processors.retrieve_categories',
                 'core.context_processors.retrieve_filter_form',
+                'core.context_processors.retrieve_liked_products',
             ],
         },
     },
