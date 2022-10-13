@@ -9,15 +9,17 @@ from .models import Order, OrderItems
 def get_current_order_items(request):
     order = Order.objects.get(session_id=request.session.session_key)
     order_items = OrderItems.objects.filter(order=order)
-    return order_items
+    return order, order_items
 
 
 def transfer_order_items(request, user, order_items):
     session_id = request.session.session_key
+
     if request.user.is_authenticated:
-        new_order, created = Order.objects.get_or_create(customer=user)
+        new_order, created = Order.objects.get_or_create(customer=user, session_id=session_id)
     else:
         new_order, created = Order.objects.get_or_create(session_id=session_id)
+
     for item in order_items:
         OrderItems.objects.get_or_create(order=new_order, product=item.product, quantity=item.quantity)
 
@@ -25,8 +27,8 @@ def transfer_order_items(request, user, order_items):
 def register(request):
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
-        order = Order.objects.get(session_id=request.session.session_key)
-        order_items = get_current_order_items(request)
+        # order = Order.objects.get(session_id=request.session.session_key)
+        order, order_items = get_current_order_items(request)
         if form.is_valid():
             user = form.save()
             login(request, user)
@@ -46,12 +48,12 @@ def login_user(request):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
-        order_items = get_current_order_items(request)
+        order, order_items = get_current_order_items(request)
         if user is not None:
             login(request, user)
             transfer_order_items(request, user, order_items)
             messages.success(request, "You've logged in successfully!")
-            return redirect('/')
+            return redirect('index')
         else:
             messages.success(request, "There was an error logging in, try again!")
             return redirect('login')

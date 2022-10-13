@@ -239,23 +239,23 @@
 
                 <div class="col-lg-4 col-md-6">
                     <div class="latest-product__text">
-                        <h4>Top Rated Products</h4>
+                        <h4>Most Liked Products</h4>
                         <div class="latest-product__slider owl-carousel">
 
-                            {% for products_grouped in products|subdivide:"3" %}
+                            {% for products_grouped in products_by_likes|subdivide:"3" %}
 
-                            <div class="latest-product__slider__item">
-                                {% for product in products_grouped %}
-                                <a href="#" class="latest-product__item">
-                                    <div class="latest-product__item__pic">
-                                        <img src="{{ product.image.url }}" alt="">
-                                    </div>
-                                    <div class="latest-product__item__text">
-                                        <h6>{{ product.name }}</h6>
-                                        <span>${{ product.price }}</span>
-                                    </div>
-                                </a>
-                                {% endfor %}
+                                <div class="latest-product__slider__item">
+                                    {% for product in products_grouped %}
+                                        <a href="#" class="latest-product__item">
+                                            <div class="latest-product__item__pic">
+                                                <img src="{{ product.image.url }}" alt="">
+                                            </div>
+                                            <div class="latest-product__item__text">
+                                                <h6>{{ product.name }}</h6>
+                                                <span>${{ product.price }}</span>
+                                            </div>
+                                        </a>
+                                    {% endfor %}
                                 </div>
                             {% endfor %}
                         </div>
@@ -311,7 +311,7 @@
                             <ul>
                                 <li>{{ post.author }}</li>
                                 <br>
-                                <li><i class="fa fa-calendar-o"></i> {{ post.created_at|format_date }}</li>
+                                <li><i class="fa fa-calendar-o"></i> {% format_date post.created_at False %}</li>
                             </ul>
                             <h5><a href="#">{{ post.heading }}</a></h5>
                             <p>{{ post.content }} </p>

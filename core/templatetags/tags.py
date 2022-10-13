@@ -25,9 +25,12 @@ def subdivide(list_: list, args: str):
     return result
 
 
-@register.filter
-def format_date(value: datetime):
-    value = value.strftime("%B %d, %Y")
+@register.simple_tag
+def format_date(value: datetime, time=False):
+    if time:
+        value = value.strftime("%B %d, %Y, %H:%M:%S")
+    else:
+        value = value.strftime("%B %d, %Y")
     return value
 
 

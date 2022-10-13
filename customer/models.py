@@ -57,9 +57,21 @@ class OrderItems(models.Model):
 class LikedProducts(models.Model):
     class Meta:
         verbose_name_plural = 'Liked Products'
+
     customer = models.ForeignKey(to=User, on_delete=models.CASCADE, null=True)
     session = models.ForeignKey(to='sessions.Session', on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(to=Product, on_delete=models.CASCADE, null=False)
+
+    def __str__(self):
+        return self.product.name
+
+
+class ProductReviews(models.Model):
+    review = models.TextField(blank=False, null=False)
+    customer = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    product = models.ForeignKey(to=Product, on_delete=models.CASCADE)
+    rating = models.FloatField()
+    date_written = models.DateTimeField(auto_now_add=True)
 
 
 class ShippingDetails(models.Model):

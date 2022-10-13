@@ -174,7 +174,14 @@ ol {
 	background: #7fad39;
 	letter-spacing: 2px;
 }
-
+.shoping__cart__total .primary-btn{
+	color: #ffffff;
+	letter-spacing: 0;
+	cursor: pointer;
+}
+.shoping__cart__total .primary-btn:hover{
+	color: #ffffff;
+}
 .site-btn {
 	font-size: 14px;
 	color: #ffffff;
@@ -249,6 +256,58 @@ ol {
 		border-left-color: transparent;
 	}
 }
+
+/*---------------------
+  Rating stars
+-----------------------*/
+/* Hide Radio button */
+.rate > input{
+  display: none;
+}
+
+.rate{
+  display: inline-block;;
+  border: 0;
+}
+
+.rate > label{
+  float: right;
+}
+
+/* Showing the stars */
+.rate > label:before{
+  display: inline-block;
+  font-size: 1.1rem;
+  font-family: FontAwesome;
+  content: "\f005";
+  margin:0;
+  padding:0.3rem .2rem;
+  cursor: pointer;
+}
+
+/* Half star */
+.rate .half:before{
+  content: "\f089";
+  position: absolute;
+  padding-right: 0;
+}
+
+/* Click and hover */
+input:checked ~ label, label:hover ~ label{
+  color: #ffb503;
+}
+
+/* hover hightlight */
+input:checked + label:hover, input:checked ~ label:hover,input:checked ~ label:hover ~ label,
+label:hover ~ input:checked ~ label{
+  color: #cc9000;
+}
+
+.rating-star i{
+  color: #ffb503 !important;
+}
+
+
 
 /*---------------------
   Header
@@ -2982,6 +3041,10 @@ ol {
 	.container {
 		max-width: 1170px;
 	}
+	.product__details__tab__desc div{
+		margin-left: auto;
+		margin-right: auto;
+	}
 }
 
 /* Medium Device = 1200px */
@@ -2989,6 +3052,10 @@ ol {
 @media only screen and (min-width: 992px) and (max-width: 1199px) {
 	.header__menu ul li {
 		margin-right: 45px;
+	}
+	.product__details__tab__desc div{
+		margin-left: auto;
+		margin-right: auto;
 	}
 	.hero__search__form {
 		width: 490px;
@@ -3017,6 +3084,10 @@ ol {
 
 @media only screen and (min-width: 768px) and (max-width: 991px) {
 	.login_form{
+		margin-left: auto;
+		margin-right: auto;
+	}
+	.product__details__tab__desc div{
 		margin-left: auto;
 		margin-right: auto;
 	}
@@ -3251,6 +3322,10 @@ ol {
 		left: 35%;
 		right: 20%;
 		top: 0;
+	}
+	.product__details__tab__desc div{
+		margin-left: auto;
+		margin-right: auto;
 	}
 	.login_form{
 		margin-left: auto;

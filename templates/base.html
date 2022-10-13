@@ -50,8 +50,8 @@
     </div>
     <div class="humberger__menu__cart">
         <ul>
-            <li><a href="#"><i class="fa fa-heart"></i> <span>{{ liked_products }}</span></a></li>
-            <li><a href="#"><i class="fa fa-shopping-bag"></i> <span>{{ cart_items }}</span></a></li>
+            <li><a href="{% url 'liked_products' %}"><i class="fa fa-heart"></i> <span>{{ liked_products }}</span></a></li>
+            <li><a href="{% url 'cart' %}"><i class="fa fa-shopping-bag"></i> <span>{{ cart_items }}</span></a></li>
         </ul>
         <div class="header__cart__price">Total: <span>${{ order.get_cart_total }}</span></div>
     </div>
@@ -172,7 +172,7 @@
             <div class="col-lg-3">
                 <div class="header__cart">
                     <ul>
-                        <li><a href="#"><i class="fa fa-heart"></i> <span>{{ liked_products }}</span></a></li>
+                        <li><a href="{% url 'liked_products' %}"><i class="fa fa-heart"></i> <span>{{ liked_products }}</span></a></li>
                         <li><a href="{% url 'cart' %}"><i class="fa fa-shopping-bag"></i> <span>{{ cart_items }}</span></a></li>
                     </ul>
                     <div class="header__cart__price">Total: <span>${{ order.get_cart_total }}</span></div>
