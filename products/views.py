@@ -3,7 +3,7 @@ import json
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
@@ -21,10 +21,12 @@ from .filters import ProductFilter
 
 
 def index(request):
-    products = Product.objects.all().order_by('created_at')
-    print(products.explain())
-    products_by_likes = list(Product.objects.all().annotate(num_likes=Count('likedproducts')).order_by('-num_likes'))
-    posts_sorted_by_date = list(Post.objects.all().order_by('-created_at'))
+    products_all = Product.objects.all().select_related()
+    products = products_all.order_by('created_at')
+    products_by_likes = products_all.annotate(num_likes=Count('likedproducts')).order_by('-num_likes')
+    products_by_reviews = products_all.annotate(reviews=Sum('productreviews')).order_by('reviews')
+    print(products_by_reviews)
+    posts_sorted_by_date = Post.objects.all().order_by('-created_at')
 
     context = {
         'products': products,
@@ -75,9 +77,9 @@ def product_details(request, id_):
 
 
 def shop_grid(request):
-    products_sorted_by_date = Product.objects.all().order_by('-created_at')[:6]
-    products_with_discount = Product.objects.filter(discount=True)
-    products = Product.objects.all()
+    products_sorted_by_date = Product.objects.all().order_by('-created_at').select_related()[:6]
+    products_with_discount = Product.objects.filter(discount=True).select_related()
+    products = Product.objects.all().select_related()
 
     filtered_products = ProductFilter(
         request.GET,
@@ -93,7 +95,7 @@ def shop_grid(request):
     page_number = request.GET.get('page', 1)
     for product in products_object:
         if product.discount:
-            product.price = product.discount_price
+            product.price = product.current_price
     products_paginated = Paginator(products_object, 9)
     page_obj = products_paginated.get_page(page_number)
 
@@ -188,11 +190,11 @@ def like_item_view(request):
     action = data['action']
 
     customer_id = request.user.id
-    product = Product.objects.get(id=product_id)
     session_id = request.session.session_key
 
     if action == 'like':
-        kwargs = {'customer_id': customer_id, 'session_id': session_id, 'product_id': product_id} if customer_id else {'session_id': session_id, 'product_id': product_id}
+        kwargs = {'customer_id': customer_id, 'session_id': session_id, 'product_id': product_id} if customer_id else {
+            'session_id': session_id, 'product_id': product_id}
         liked_products = LikedProducts.objects.filter(**kwargs)
 
         if not liked_products:
@@ -206,7 +208,19 @@ def like_item_view(request):
 
 
 def cart(request):
-    return render(request, 'shopping-cart.html')
+    customer = request.user.id
+    session_id = request.session.session_key
+    if request.user.is_authenticated:
+        order, created = Order.objects.get_or_create(customer_id=customer, session_id=session_id, completed=False)
+    else:
+        order, created = Order.objects.get_or_create(session_id=session_id, completed=False)
+    items = OrderItems.objects.select_related('product').filter(order=order)
+    for item in items:
+        item.total = item.product.price * item.quantity
+    context = {
+        'items': items,
+    }
+    return render(request, 'shopping-cart.html', context)
 
 
 def liked_products_view(request):
@@ -219,18 +233,21 @@ def liked_products_view(request):
     #     order, created = Order.objects.get_or_create(session_id=session_id, completed=False)
     #     liked_products = LikedProducts.objects.filter(session_id=session_id)
 
-    order_kwargs = {'customer_id': customer_id, 'session_id': session_id, 'completed': False} if customer_id else {'session_id': session_id, 'completed': False}
-    liked_products_kwargs = {'customer_id': customer_id, 'session_id': session_id} if customer_id else {'session_id': session_id}
+    order_kwargs = {'customer_id': customer_id, 'session_id': session_id, 'completed': False} if customer_id else {
+        'session_id': session_id, 'completed': False}
+    liked_products_kwargs = {'customer_id': customer_id, 'session_id': session_id} if customer_id else {
+        'session_id': session_id}
     order, created = Order.objects.get_or_create(**order_kwargs)
     items = OrderItems.objects.prefetch_related('product').filter(order=order)
     liked_products = LikedProducts.objects.prefetch_related('product').filter(**liked_products_kwargs)
-    for product in list(liked_products):
-        print(product)
-        if product in list(items):
-            print(product)
-    print(items)
-    print(liked_products)
-    # for product in liked_products:
+    items_dict = {item.product.id: item.quantity for item in items}
+    for liked_product in liked_products:
+        if liked_product.product.id in items_dict.keys():
+            liked_product.quantity = items_dict[liked_product.product.id]
+        else:
+            liked_product.quantity = 0
+
+            # for product in liked_products:
     #     item = OrderItems.objects.filter(order=order, product=product.product.id)
     #     quantity_qs = item.values('quantity')
     #     price_qs = item.values('product__price')
@@ -244,7 +261,7 @@ def liked_products_view(request):
     #     product.quantity = quantity_qs[0]['quantity'] if len(quantity_qs) > 0 else 0
 
     context = {
-        # 'liked_products_list': liked_products,
+        'liked_products_list': liked_products,
     }
     return render(request, 'liked_products.html', context)
 

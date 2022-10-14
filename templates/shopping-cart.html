@@ -46,11 +46,7 @@
                                         <h5>{{ item.product.name }}</h5>
                                     </td>
                                     <td class="shoping__cart__price">
-                                        {% if item.product.discount %}
-                                            ${{ item.product.discount_price }}
-                                        {% else %}
-                                            ${{ item.product.price }}
-                                        {% endif %}
+                                        ${{ item.product.current_price }}
                                     </td>
                                     <td class="shoping__cart__quantity">
                                         <div class="quantity">
@@ -62,7 +58,7 @@
                                         </div>
                                     </td>
                                     <td class="shoping__cart__total">
-                                        ${{ item.get_total }}
+                                        ${{ item.total }}
                                     </td>
                                     <td class="shoping__cart__item__close">
                                         <span data-product="{{ item.product.id }}" data-action="delete" class="icon_close update-cart"></span>
@@ -97,8 +93,8 @@
                     <div class="shoping__checkout">
                         <h5>Cart Total</h5>
                         <ul>
-                            <li>Subtotal <span>${{ order.get_cart_total }}</span></li>
-                            <li>Total <span>${{ order.get_cart_total }}</span></li>
+                            <li>Subtotal <span>${{ order_total }}</span></li>
+                            <li>Total <span>${{ order_total }}</span></li>
                         </ul>
                         <a href="#" class="primary-btn">PROCEED TO CHECKOUT</a>
                     </div>

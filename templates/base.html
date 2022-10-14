@@ -53,7 +53,7 @@
             <li><a href="{% url 'liked_products' %}"><i class="fa fa-heart"></i> <span>{{ liked_products }}</span></a></li>
             <li><a href="{% url 'cart' %}"><i class="fa fa-shopping-bag"></i> <span>{{ cart_items }}</span></a></li>
         </ul>
-        <div class="header__cart__price">Total: <span>${{ order.get_cart_total }}</span></div>
+        <div class="header__cart__price">Total: <span>${{ order_total }}</span></div>
     </div>
     <div class="humberger__menu__widget">
 <!--        <div class="header__top__right__language">-->
@@ -175,7 +175,7 @@
                         <li><a href="{% url 'liked_products' %}"><i class="fa fa-heart"></i> <span>{{ liked_products }}</span></a></li>
                         <li><a href="{% url 'cart' %}"><i class="fa fa-shopping-bag"></i> <span>{{ cart_items }}</span></a></li>
                     </ul>
-                    <div class="header__cart__price">Total: <span>${{ order.get_cart_total }}</span></div>
+                    <div class="header__cart__price">Total: <span>${{ order_total }}</span></div>
                 </div>
             </div>
         </div>
@@ -198,7 +198,7 @@
                         </div>
                         <ul>
                             {% for category in categories %}
-                            <li><a href="#">{{ category.name }}</a></li>
+                            <li><a href="{% url 'shop_grid' %}{% my_url category.id 'category' request.GET.urlencode %}">{{ category.name }}</a></li>
                             {% endfor %}
                         </ul>
                     </div>

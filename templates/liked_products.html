@@ -46,11 +46,7 @@
                                         <h5>{{ item.product.name }}</h5>
                                     </td>
                                     <td class="shoping__cart__price">
-                                        {% if item.product.discount %}
-                                            ${{ item.product.discount_price }}
-                                        {% else %}
-                                            ${{ item.product.price }}
-                                        {% endif %}
+                                        ${{ item.product.current_price }}
                                     </td>
                                     <td class="shoping__cart__quantity">
                                         <div class="quantity">

@@ -1,6 +1,7 @@
 from math import ceil
 
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.shortcuts import render
 from django.utils.datastructures import MultiValueDictKeyError
 
@@ -8,18 +9,17 @@ from posts.models import Post, PostCategory
 
 
 def blog(request):
-    post_categories = PostCategory.objects.all()
+    categories = PostCategory.objects.all().select_related()
     posts_sorted_by_date = Post.objects.all().order_by('-created_at')[:6]
     posts = Post.objects.all()
 
     try:
         post_name = request.GET['heading']
         category = request.GET['category']
-        posts_object = Post.objects.filter(heading__icontains=post_name, category__id__icontains=category)
+        posts_object = Post.objects.filter(Q(heading__icontains=post_name, category__id=category))
     except (MultiValueDictKeyError, ValueError):
         posts_object = posts_sorted_by_date
 
-    print(posts_object)
     # filtered_posts = PostFilter(
     #     request.GET,
     #     queryset=posts
@@ -30,7 +30,7 @@ def blog(request):
     page_obj = paginator.get_page(page_number)
     context = {
         'posts': posts,
-        'post_categories': post_categories,
+        'categories': categories,
         'posts_by_date': posts_sorted_by_date,
         'page_obj': page_obj,
     }

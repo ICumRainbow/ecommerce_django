@@ -18,6 +18,10 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def slugified_name(self):
+        return ''.join(filter(str.isalnum, self.name))
+
     def child_products(self):
         return self.products.all()
 
@@ -51,5 +55,7 @@ class Product(models.Model):
         return count
 
     @property
-    def discount_price(self) -> float:
-        return round(self.price * (100 - self.discount_rate) / 100, 2)
+    def current_price(self) -> float:
+        if self.discount:
+            return round(self.price * (100 - self.discount_rate) / 100, 2)
+        return float(self.price)

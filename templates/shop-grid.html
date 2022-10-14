@@ -107,7 +107,7 @@
                                     <div class="product__discount__item__text">
                                         <span>{{ product.category }}</span>
                                         <h5><a href="{% url 'product_details' product.id %}">{{ product.name }}</a></h5>
-                                        <div class="product__item__price">${{product.discount_price }}
+                                        <div class="product__item__price">${{product.current_price }}
                                             <span>${{ product.price }}</span></div>
                                     </div>
                                 </div>
