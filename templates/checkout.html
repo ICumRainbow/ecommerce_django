@@ -110,8 +110,8 @@
                                         <li>{{ item.product.name }} <span>${{ item.get_total }}</span></li>
                                     {% endfor %}
                                 </ul>
-                                <div class="checkout__order__subtotal">Subtotal <span>${{ order.get_cart_total }}</span></div>
-                                <div class="checkout__order__total">Total <span>${{ order.get_cart_total }}</span></div>
+                                <div class="checkout__order__subtotal">Subtotal <span>${{ order_total }}</span></div>
+                                <div class="checkout__order__total">Total <span>${{ order_total }}</span></div>
                                 <div class="checkout__input__checkbox">
                                     {{ checkout_form.payment_type }}
                                 </div>

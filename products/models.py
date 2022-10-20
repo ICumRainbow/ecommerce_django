@@ -40,20 +40,6 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-    def average_review(self):
-        reviews = customer.models.ProductReviews.objects.filter(product=self).aggregate(average=Avg('rating'))
-        avg = 0
-        if reviews['average'] is not None:
-            avg = float(reviews['average'])
-        return avg
-
-    def count_review(self):
-        reviews = customer.models.ProductReviews.objects.filter(product=self).aggregate(count=Count('id'))
-        count = 0
-        if reviews['count'] is not None:
-            count = int(reviews['count'])
-        return count
-
     @property
     def current_price(self) -> float:
         if self.discount:

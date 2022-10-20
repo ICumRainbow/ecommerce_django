@@ -3,12 +3,9 @@ import json
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Count, Q, Sum
-from django.shortcuts import render, redirect
+from django.db.models import Count, Avg
+from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseRedirect
-from django.contrib.auth.models import User
-
-from math import ceil
 
 from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import csrf_exempt
@@ -20,120 +17,25 @@ from products.models import Product
 from .filters import ProductFilter
 
 
-def index(request):
-    products_all = Product.objects.all().select_related()
-    products = products_all.order_by('created_at')
-    products_by_likes = products_all.annotate(num_likes=Count('likedproducts')).order_by('-num_likes')
-    products_by_reviews = products_all.annotate(reviews=Sum('productreviews')).order_by('reviews')
-    print(products_by_reviews)
-    posts_sorted_by_date = Post.objects.all().order_by('-created_at')
-
-    context = {
-        'products': products,
-        'posts_by_date': posts_sorted_by_date,
-        'products_by_likes': products_by_likes,
-    }
-    return render(request, 'index.html', context)
-
-
-def product_details(request, id_):
-    product = Product.objects.get(id=id_)
-    related_products = Product.objects.filter(category=product.category).exclude(id=id_)
-    customer_id = request.user.id
-    session_id = request.session.session_key
-    review_form = ReviewForm(request.POST)
-    if request.user.is_authenticated:
-        order, created = Order.objects.get_or_create(customer_id=customer_id, completed=False)
-        print(created)
-    else:
-        order, created = Order.objects.get_or_create(session_id=session_id, completed=False)
-
-    try:
-        order_item = order.orderitems_set.get(product_id=id_)
-    except OrderItems.DoesNotExist:
-        quantity = 0
-    else:
-        quantity = order_item.quantity
-
+def save_review_form(request, form, product):
     if request.method == 'POST':
-        if review_form.is_valid():
-            review: ProductReviews = review_form.save(commit=False)
+        if form.is_valid():
+            review: ProductReviews = form.save(commit=False)
             review.customer = request.user
             review.product = product
             review.save()
             return HttpResponseRedirect(request.path_info)
         else:
-            print(review_form.errors.as_data)
-    reviews = ProductReviews.objects.filter(product=product)
-    context = {
-        'product': product,
-        'product_quantity': quantity,
-        'related_products': related_products,
-        'review_form': review_form,
-        'reviews': reviews,
-    }
-
-    return render(request, 'product-details.html', context)
+            print(form.errors.as_data)
 
 
-def shop_grid(request):
-    products_sorted_by_date = Product.objects.all().order_by('-created_at').select_related()[:6]
-    products_with_discount = Product.objects.filter(discount=True).select_related()
-    products = Product.objects.all().select_related()
-
-    filtered_products = ProductFilter(
-        request.GET,
-        queryset=products
-    )
-    try:
-        product_name = request.GET['name']
-        category = request.GET['category']
-        products_object = Product.objects.filter(name__icontains=product_name, category__id=category)
-    except (MultiValueDictKeyError, ValueError):
-        products_object = filtered_products.qs
-
-    page_number = request.GET.get('page', 1)
-    for product in products_object:
-        if product.discount:
-            product.price = product.current_price
-    products_paginated = Paginator(products_object, 9)
-    page_obj = products_paginated.get_page(page_number)
-
-    context = {
-        'products': products,
-        'products_with_discount': products_with_discount,
-        'products_sorted_by_date': products_sorted_by_date,
-        'page_obj': page_obj,
-    }
-    return render(request, 'shop-grid.html', context)
-
-
-@login_required(login_url='login')
-def checkout_view(request):
-    payment_type_mapping = {
-        'click': ShippingDetails.PaymentType.CLICK,
-        'payme': ShippingDetails.PaymentType.PAYME
-    }
-
-    customer = request.user.id
-    session_id = request.session.session_key
-
-    # if request.user.is_authenticated:
-    order, created = Order.objects.get_or_create(customer_id=customer, completed=False)
-    # else:
-    #     order, created = Order.objects.get_or_create(session_id=session_id, completed=False)
-    order_items = OrderItems.objects.filter(order=order)
-    checkout_form = CheckoutForm(request.POST)
-
-    context = {
-        'checkout_form': checkout_form,
-    }
+def save_checkout_form(request, items, form, order):
     if request.method == 'POST':
-        if not order_items:
+        if not items:
             messages.success(request, 'You have no items in your cart!')
-            return render(request, 'checkout.html', context)
-        if checkout_form.is_valid():
-            checkout: ShippingDetails = checkout_form.save(commit=False)
+            return HttpResponseRedirect(request.path_info)
+        if form.is_valid():
+            checkout: ShippingDetails = form.save(commit=False)
             checkout.customer_id = request.user.id
             checkout.order = order
             checkout.save()
@@ -141,9 +43,88 @@ def checkout_view(request):
             order.save()
             return HttpResponseRedirect(request.path_info)
         else:
-            print(checkout_form.errors.as_data)
-            print('FUCK YOU')
-    return render(request, 'checkout.html', context)
+            print(form.errors.as_data)
+
+
+def get_or_create_order(request):
+    customer_id = request.user.id
+    session_id = request.session.session_key
+    order_kwargs = {'customer_id': customer_id, 'session_id': session_id, 'completed': False} if customer_id else {
+        'session_id': session_id, 'completed': False}
+    order, created = Order.objects.get_or_create(**order_kwargs)
+    items = OrderItems.objects.select_related('product').filter(order=order)
+    return order, items
+
+
+def index(request):
+    # single request to the database to retrieve products and categories
+    products = Product.objects.select_related('category').annotate(num_likes=Count('likedproducts'), reviews=Avg('productreviews__rating'))
+
+    featured_products = products.order_by('-created_at')
+    products_by_likes = products.order_by('-num_likes')
+    products_by_reviews = products.order_by('-reviews')
+    blog_posts = Post.objects.all().order_by('-created_at')
+
+    context = {
+        'blog_posts': blog_posts,
+        'featured_products': featured_products,
+        'products_by_reviews': products_by_reviews,
+        'products_by_likes': products_by_likes,
+    }
+    return render(request, 'index.html', context)
+
+
+def product_details(request, id_):
+    products = Product.objects.select_related('category')
+    product = products.get(id=id_)
+    related_products = products.filter(category_id=product.category).exclude(id=id_)
+
+    reviews = ProductReviews.objects.filter(product=product).prefetch_related('customer')
+    reviews_numbers = reviews.aggregate(average=Avg('rating'), count=Count('id'))
+    product.average_review = reviews_numbers['average'] or 0
+    product.count_review = reviews_numbers['count']
+    review_form = ReviewForm(request.POST)
+    save_review_form(request, review_form, product)
+    # getting the current order to retrieve the current product's quantity
+    order, items = get_or_create_order(request)
+    # getting product's quantity if it is present in the order
+    item = order.orderitems_set.filter(product_id=id_)
+    product.quantity = item[0].quantity if item else 0
+
+    context = {
+        'product': product,
+        'related_products': related_products,
+        'review_form': review_form,
+        'reviews': reviews,
+    }
+    return render(request, 'product-details.html', context)
+
+
+def shop_grid(request):
+    products = Product.objects.select_related('category').order_by('-created_at').defer('description', 'in_stock', 'created_at')
+    products_with_discount = products.filter(discount=True)
+    product_name = request.GET.get('name', '')
+    category = request.GET.get('category', False)
+    query_params = {'name__icontains': product_name}
+    if category:
+        query_params['category'] = category
+    filtered_products = products.filter(**query_params)
+    # filter for search by name, price and category
+    filtered_products = ProductFilter(request.GET, queryset=filtered_products)
+    # getting current price (with or without discount) for each product
+    for product in filtered_products.qs:
+        product.price = product.current_price
+    page_number = request.GET.get('page', 1)
+    products_paginated = Paginator(filtered_products.qs, 9)
+    page = products_paginated.get_page(page_number)
+
+    context = {
+        'products_with_discount': products_with_discount,
+        'products_sorted_by_date': products[:6],
+        'page': page,
+        'filtered_products': filtered_products,
+    }
+    return render(request, 'shop-grid.html', context)
 
 
 @csrf_exempt
@@ -152,13 +133,8 @@ def update_item_view(request):
     product_id = data['productId']
     action = data['action']
 
-    customer = request.user.id
     product = Product.objects.get(id=product_id)
-    session_id = request.session.session_key
-    if request.user.is_authenticated:
-        order, created = Order.objects.get_or_create(customer_id=customer, session_id=session_id, completed=False)
-    else:
-        order, created = Order.objects.get_or_create(session_id=session_id, completed=False)
+    order, items = get_or_create_order(request)
 
     order_item, created = OrderItems.objects.get_or_create(order=order, product=product)
 
@@ -193,7 +169,7 @@ def like_item_view(request):
     session_id = request.session.session_key
 
     if action == 'like':
-        kwargs = {'customer_id': customer_id, 'session_id': session_id, 'product_id': product_id} if customer_id else {
+        kwargs = {'customer_id': customer_id, 'product_id': product_id} if customer_id else {
             'session_id': session_id, 'product_id': product_id}
         liked_products = LikedProducts.objects.filter(**kwargs)
 
@@ -208,88 +184,48 @@ def like_item_view(request):
 
 
 def cart(request):
-    customer = request.user.id
-    session_id = request.session.session_key
-    if request.user.is_authenticated:
-        order, created = Order.objects.get_or_create(customer_id=customer, session_id=session_id, completed=False)
-    else:
-        order, created = Order.objects.get_or_create(session_id=session_id, completed=False)
-    items = OrderItems.objects.select_related('product').filter(order=order)
+    order, items = get_or_create_order(request)
     for item in items:
-        item.total = item.product.price * item.quantity
+        item.total = item.product.current_price * item.quantity
     context = {
         'items': items,
     }
     return render(request, 'shopping-cart.html', context)
 
 
+@login_required(login_url='login')
+def checkout_view(request):
+    order, items = get_or_create_order(request)
+    for item in items:
+        item.total = item.product.current_price * item.quantity
+    checkout_form = CheckoutForm(request.POST)
+
+    save_checkout_form(request, items, checkout_form, order)
+
+    context = {
+        'checkout_form': checkout_form,
+        'items': items,
+    }
+
+    return render(request, 'checkout.html', context)
+
+
 def liked_products_view(request):
     session_id = request.session.session_key
     customer_id = request.user.id
-    # if request.user.is_authenticated:
-    #     order, created = Order.objects.get_or_create(customer_id=customer_id, session_id=session_id, completed=False)
-    #     liked_products = LikedProducts.objects.filter(customer=customer_id)
-    # else:
-    #     order, created = Order.objects.get_or_create(session_id=session_id, completed=False)
-    #     liked_products = LikedProducts.objects.filter(session_id=session_id)
 
-    order_kwargs = {'customer_id': customer_id, 'session_id': session_id, 'completed': False} if customer_id else {
-        'session_id': session_id, 'completed': False}
-    liked_products_kwargs = {'customer_id': customer_id, 'session_id': session_id} if customer_id else {
-        'session_id': session_id}
-    order, created = Order.objects.get_or_create(**order_kwargs)
-    items = OrderItems.objects.prefetch_related('product').filter(order=order)
+    order, items = get_or_create_order(request)
+    liked_products_kwargs = {'customer_id': customer_id} if customer_id else {'session_id': session_id}
     liked_products = LikedProducts.objects.prefetch_related('product').filter(**liked_products_kwargs)
     items_dict = {item.product.id: item.quantity for item in items}
+    # if a liked product is also in customer's cart, we display it's quantity
     for liked_product in liked_products:
         if liked_product.product.id in items_dict.keys():
             liked_product.quantity = items_dict[liked_product.product.id]
         else:
             liked_product.quantity = 0
 
-            # for product in liked_products:
-    #     item = OrderItems.objects.filter(order=order, product=product.product.id)
-    #     quantity_qs = item.values('quantity')
-    #     price_qs = item.values('product__price')
-    #     print(price_qs)
-    #     discount_rate_qs = item.values('product__discount_rate')
-    #     print(discount_rate_qs)
-    #     discount_qs = item.values('product__discount')
-    #     print(discount_qs)
-    #     product.price = round(price_qs[0]['product__price'] * (100 - discount_rate_qs[0]['product__discount_rate']) / 100, 2) if discount_qs[0]['product__discount'] else price_qs[0]['product__price']
-    #     print(price_qs)
-    #     product.quantity = quantity_qs[0]['quantity'] if len(quantity_qs) > 0 else 0
-
     context = {
         'liked_products_list': liked_products,
     }
     return render(request, 'liked_products.html', context)
-
-# def product_search(request):
-#     products_sorted_by_date = Product.objects.all().order_by('-created_at')[:6]
-#     if request.method == 'GET':
-#         product_name = request.GET['name']
-#         category = request.GET['category']
-#         product_object = Product.objects.filter(name__icontains=product_name, category__id__icontains=category)
-#
-#     search_query_name = request.GET['name']
-#     if request.GET['category']:
-#         search_query_category = Category.objects.get(id=request.GET['category'])
-#     else:
-#         search_query_category = ''
-#
-#     page_number = request.GET.get('page', 1)
-#     products_paginated = Paginator(product_object, 9)
-#     page_obj = products_paginated.get_page(page_number)
-#     page_count = ceil(len(product_object) / 9)
-#     page_count_range = range(1, page_count + 1)
-#
-#     context = {
-#         'page_obj': page_obj,
-#         'page_count_range': page_count_range,
-#         'products_sorted_by_date': products_sorted_by_date,
-#         'search_query_name': search_query_name,
-#         'search_query_category': search_query_category,
-#     }
-#
-#     return render(request, 'search.html', context)

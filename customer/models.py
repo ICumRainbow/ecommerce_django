@@ -93,3 +93,13 @@ class ShippingDetails(models.Model):
 
     def __str__(self):
         return f'{self.customer.username} - {self.order_id}'
+
+
+class EmailSubscriptions(models.Model):
+    email = models.EmailField(unique=True)
+
+
+class ContactMessages(models.Model):
+    name = models.CharField(max_length=30, null=False)
+    contact_email = models.EmailField()
+    message = models.TextField(max_length=200, null=False)

@@ -35,7 +35,7 @@
 
                                 <select name="category" id="categories">
                                     <option value="">All</option>
-                                    {% for category in categories %}
+                                    {% for category in post_categories %}
                                     <option value="{{ category.id }}">{{ category.name }}</option>
                                     {% endfor %}
                                 </select>
@@ -51,11 +51,11 @@
                         <div class="blog__sidebar__item">
                             <h4>Recent News</h4>
                             <div class="blog__sidebar__recent">
-                                {% for sorted_post in posts_by_date %}
-                                <a href="#" class="blog__sidebar__recent__item">
+                                {% for post in posts_by_date %}
+                                <a href="{% url 'post' post.id %}" class="blog__sidebar__recent__item">
                                     <div class="blog__sidebar__recent__item__text">
-                                        <h6> {{ sorted_post.heading|truncatechars:40 }} </h6>
-                                        <span>{% format_date sorted_post.created_at %}</span>
+                                        <h6> {{ post.heading|truncatechars:40 }} </h6>
+                                        <span>{% format_date post.created_at %}</span>
                                     </div>
                                 </a>
                                 {% endfor %}
@@ -66,7 +66,7 @@
 
                 <div class="col-lg-8 col-md-7">
                     <div class="row">
-                        {% for post in page_obj %}
+                        {% for post in page %}
                         <div class="col-lg-6 col-md-6 col-sm-6">
 
                             <div class="blog__item">
@@ -86,7 +86,7 @@
                         </div>
                         {% endfor %}
                         <div class="col-lg-12">
-                            {% if page_obj %}
+                            {% if page %}
                                 {% include "pagination.html" %}
                             {% endif %}
                         </div>

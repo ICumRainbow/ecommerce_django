@@ -17,6 +17,7 @@ class PostCategory(models.Model):
 
 class Post(models.Model):
     author = models.CharField('Author', max_length=100, null=False)
+    avatar = models.ImageField('Avatar', default='details-author.jpg')
     heading = models.CharField('Heading', max_length=200, null=False)
     picture = models.ImageField('Image', default='product-1.jpg')
     content = models.TextField('Content')

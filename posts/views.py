@@ -1,43 +1,33 @@
-from math import ceil
-
 from django.core.paginator import Paginator
-from django.db.models import Q
 from django.shortcuts import render
-from django.utils.datastructures import MultiValueDictKeyError
 
 from posts.models import Post, PostCategory
 
 
 def blog(request):
-    categories = PostCategory.objects.all().select_related()
-    posts_sorted_by_date = Post.objects.all().order_by('-created_at')[:6]
-    posts = Post.objects.all()
+    categories = PostCategory.objects.all()
+    posts_by_date = Post.objects.order_by('-created_at')
+    post_name = request.GET.get('heading', '')
+    category = request.GET.get('category', False)
 
-    try:
-        post_name = request.GET['heading']
-        category = request.GET['category']
-        posts_object = Post.objects.filter(Q(heading__icontains=post_name, category__id=category))
-    except (MultiValueDictKeyError, ValueError):
-        posts_object = posts_sorted_by_date
+    query_params = {'heading__icontains': post_name}
 
-    # filtered_posts = PostFilter(
-    #     request.GET,
-    #     queryset=posts
-    # )
-    paginator = Paginator(posts_object, 4)
+    if category:
+        query_params['category_id'] = int(category)
+
+    posts = posts_by_date.filter(**query_params)
+
+    paginator = Paginator(posts, 4)
 
     page_number = request.GET.get('page', 1)
-    page_obj = paginator.get_page(page_number)
+    page = paginator.get_page(page_number)
     context = {
-        'posts': posts,
-        'categories': categories,
-        'posts_by_date': posts_sorted_by_date,
-        'page_obj': page_obj,
+        'post_categories': categories,
+        'posts_by_date': posts_by_date[:6],
+        'page': page,
     }
 
     return render(request, 'blog.html', context)
-
-
 
 
 # def blog_search(request):
@@ -67,8 +57,10 @@ def blog(request):
 
 def post_details(request, id):
     post = Post.objects.get(id=id)
+    posts_by_date = Post.objects.order_by('-created_at')
     related_posts = Post.objects.filter(category=post.category).exclude(id=id)
     context = {
+        'posts_by_date': posts_by_date,
         'post': post,
         'related_posts': related_posts,
     }

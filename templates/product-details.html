@@ -54,12 +54,12 @@
 {#                            <i class="fa fa-star-half-o"></i>#}
 {#                            <span>(18 reviews)</span>#}
 {#                        </div>#}
-                        <div class="product__details__price">${{ product.price }}</div>
+                        <div class="product__details__price">${{ product.current_price }}</div>
                         <div class="product__details__quantity">
                             <div class="quantity">
                                 <div class="pro-qty">
                                     <span data-product="{{ product.id }}" data-action="remove" class="dec qtybtn update-cart">-</span>
-                                    <input type="text" value="{{ product_quantity }}">
+                                    <input type="text" value="{{ product.quantity }}">
                                     <span data-product="{{ product.id }}" data-action="add" class="inc qtybtn update-cart">+</span>
                                 </div>
                             </div>
@@ -81,10 +81,6 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab"
-                                    aria-selected="false">Information</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab"
                                     aria-selected="false">Reviews <span>({{product.count_review}})</span></a>
                             </li>
                         </ul>
@@ -96,12 +92,6 @@
                                 </div>
                             </div>
                             <div class="tab-pane" id="tabs-2" role="tabpanel">
-                                <div class="product__details__tab__desc">
-                                    <h6>Products Information</h6>
-                                    <p>{{ product.description }}</p>
-                                </div>
-                            </div>
-                            <div class="tab-pane" id="tabs-3" role="tabpanel">
                                 <div class="product__details__tab__desc">
                                     <div class="col-lg-8">
                                         <h6>Reviews</h6>
@@ -180,7 +170,7 @@
                         </div>
                         <div class="product__item__text">
                             <h6><a href="{% url 'product_details' product.id %}">{{ product.name }}</a></h6>
-                            <h5>${{ product.price }}</h5>
+                            <h5>${{ product.current_price }}</h5>
                         </div>
                     </div>
                 </div>
