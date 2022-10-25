@@ -712,7 +712,6 @@ label:hover ~ input:checked ~ label{
 }
 
 .search-form .nice-select{
-	bottom: 24px;
 	padding-left: 10px;
 	padding-bottom: 6px;
 	padding-right: 40px;

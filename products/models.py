@@ -45,3 +45,5 @@ class Product(models.Model):
         if self.discount:
             return round(self.price * (100 - self.discount_rate) / 100, 2)
         return float(self.price)
+
+

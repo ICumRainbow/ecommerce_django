@@ -208,16 +208,9 @@
                         <div class="hero__search__form">
                             <form action="{% url 'shop_grid' %}" method="GET" class="search-form">
                                 <div class="hero__search__categories">
-                                <label for="categories"></label>
-
-                                <select name="category" id="categories">
-                                    <option value="">All</option>
-                                    {% for category in categories %}
-                                    <option value="{{ category.id }}">{{ category.name }}</option>
-                                    {% endfor %}
-                                </select>
+                                {{ filtered_products.form.category }}
                                 </div>
-                                <input type="text" placeholder="Search" name="name">
+                                <input type="text" placeholder="Search" name="name" value="{{ request.GET.name }}">
                                 <button type="submit" class="site-btn">SEARCH</button>
                             </form>
                         </div>

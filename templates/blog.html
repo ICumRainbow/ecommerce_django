@@ -31,19 +31,12 @@
                         <form action="" method="GET">
                             <div class="blog__sidebar__item">
                                 <h4>Filter by categories</h4>
-                                <label for="categories"></label>
-
-                                <select name="category" id="categories">
-                                    <option value="">All</option>
-                                    {% for category in post_categories %}
-                                    <option value="{{ category.id }}">{{ category.name }}</option>
-                                    {% endfor %}
-                                </select>
+                                {{ posts.form.category }}
 
                             </div>
                             <div class="blog__sidebar__search">
                                 <h4>Search</h4>
-                                <input type="text" placeholder="Search" name="heading">
+                                {{ posts.form.heading }}
                                 <button type="submit"><span class="icon_search"></span></button>
                             </div>
 

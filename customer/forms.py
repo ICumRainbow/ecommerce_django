@@ -6,17 +6,14 @@ from .models import User, ShippingDetails, ProductReviews, EmailSubscriptions, C
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField()
+
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'phone')
 
 
-# class CustomUserChangeForm(UserChangeForm):
-#     class Meta:
-#         model = User
-#         fields = ('username', 'first_name', 'last_name', 'email', 'phone')
-
 class CheckoutForm(forms.ModelForm):
+    # these fields are disabled because customer doesn't have to see it, this info is retrieved & sent by ourselves
     customer_id = forms.CharField(required=False, disabled=True)
     order_id = forms.CharField(required=False, disabled=True)
 
@@ -39,7 +36,7 @@ class ReviewForm(forms.ModelForm):
 
 
 class EmailSubForm(forms.ModelForm):
-    email = forms.EmailField(required=False)
+    email = forms.EmailField()
 
     class Meta:
         model = EmailSubscriptions

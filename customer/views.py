@@ -70,6 +70,7 @@ def logout_view(request):
 
 def contact_view(request):
     form = ContactForm(request.POST)
+    # because there can be two POST forms on one page (EmailSub form), we specify the IF condition
     if request.method == 'POST' and 'name' in request.POST:
         if form.is_valid():
             form.save()
