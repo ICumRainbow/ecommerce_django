@@ -16,6 +16,7 @@ def get_current_order_items(request):
 # transferring the items to order of a newly registered user
 def transfer_order_items(request, user, order_items):
     session_id = request.session.session_key
+
     order_kwargs = {'customer': user, 'completed': False} if request.user.id else {'session_id': session_id, 'completed': False}
     order, created = Order.objects.get_or_create(**order_kwargs)
     order.session_id = session_id

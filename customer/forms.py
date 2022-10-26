@@ -14,8 +14,8 @@ class CustomUserCreationForm(UserCreationForm):
 
 class CheckoutForm(forms.ModelForm):
     # these fields are disabled because customer doesn't have to see it, this info is retrieved & sent by ourselves
-    customer_id = forms.CharField(required=False, disabled=True)
-    order_id = forms.CharField(required=False, disabled=True)
+    # customer_id = forms.CharField(required=False, disabled=True)
+    # order_id = forms.CharField(required=False, disabled=True)
 
     class Meta:
         model = ShippingDetails

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load tags %}
 {% load static %}
-<body>
+
 {% block content %}
 
     <!-- Breadcrumb Section Begin -->
@@ -30,16 +30,16 @@
                     <div class="shoping__cart__table">
                         <table>
                             <thead>
-                                <tr>
-                                    <th class="shoping__product">Products</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th></th>
-                                    <th></th>
-                                </tr>
+                            <tr>
+                                <th class="shoping__product">Products</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
                             </thead>
                             <tbody>
-                                {% for item in liked_products_list %}
+                            {% for item in liked_products_list %}
                                 <tr>
                                     <td class="shoping__cart__item">
                                         <img src="{{ item.product.image.url }}" alt="">
@@ -58,7 +58,7 @@
                                         </div>
                                     </td>
                                     <td class="shoping__cart__total">
-                                        <a data-product="{{item.product.id}}" data-action="add" class="primary-btn update-cart">ADD TO CART</a>
+                                        <a data-product="{{ item.product.id }}" data-action="add" class="primary-btn update-cart">ADD TO CART</a>
                                     </td>
                                     <td class="shoping__cart__item__close">
                                         <span data-product="{{ item.product.id }}" data-action="like" class="icon_close like-product"></span>
@@ -78,34 +78,30 @@
                             Go to Cart</a>
                     </div>
                 </div>
-{#                <div class="col-lg-6">#}
-{#                    <div class="shoping__continue">#}
-{#                        <div class="shoping__discount">#}
-{#                            <h5>Discount Codes</h5>#}
-{#                            <form action="#">#}
-{#                                <input type="text" placeholder="Enter your coupon code">#}
-{#                                <button type="submit" class="site-btn">APPLY COUPON</button>#}
-{#                            </form>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="col-lg-6">#}
-{#                    <div class="shoping__checkout">#}
-{#                        <h5>Cart Total</h5>#}
-{#                        <ul>#}
-{#                            <li>Subtotal <span>${{ order.get_cart_total }}</span></li>#}
-{#                            <li>Total <span>${{ order.get_cart_total }}</span></li>#}
-{#                        </ul>#}
-{#                        <a href="#" class="primary-btn">PROCEED TO CHECKOUT</a>#}
-{#                    </div>#}
-{#                </div>#}
+                {#                <div class="col-lg-6">#}
+                {#                    <div class="shoping__continue">#}
+                {#                        <div class="shoping__discount">#}
+                {#                            <h5>Discount Codes</h5>#}
+                {#                            <form action="#">#}
+                {#                                <input type="text" placeholder="Enter your coupon code">#}
+                {#                                <button type="submit" class="site-btn">APPLY COUPON</button>#}
+                {#                            </form>#}
+                {#                        </div>#}
+                {#                    </div>#}
+                {#                </div>#}
+                {#                <div class="col-lg-6">#}
+                {#                    <div class="shoping__checkout">#}
+                {#                        <h5>Cart Total</h5>#}
+                {#                        <ul>#}
+                {#                            <li>Subtotal <span>${{ order.get_cart_total }}</span></li>#}
+                {#                            <li>Total <span>${{ order.get_cart_total }}</span></li>#}
+                {#                        </ul>#}
+                {#                        <a href="#" class="primary-btn">PROCEED TO CHECKOUT</a>#}
+                {#                    </div>#}
+                {#                </div>#}
             </div>
         </div>
     </section>
     <!-- Shoping Cart Section End -->
 
 {% endblock %}
-
-</body>
-
-</html>

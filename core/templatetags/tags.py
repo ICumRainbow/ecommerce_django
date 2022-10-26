@@ -1,5 +1,3 @@
-from typing import Optional
-
 from django import template
 import datetime
 
@@ -36,8 +34,9 @@ def format_date(value: datetime, time=False):
 
 @register.simple_tag
 def my_url(value, field_name, urlencode=None):
-    url = '?{}={}'.format(field_name, value)
-
+    url = f'?{field_name}={value}'
+    # PISHI SAM!
+    # request.GET[field_name] = value
     if urlencode:
         querystring = urlencode.split('&')
         filtered_querystring = filter(lambda p: p.split('=')[0] != field_name, querystring)

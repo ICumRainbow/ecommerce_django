@@ -1494,11 +1494,36 @@ label:hover ~ input:checked ~ label{
 	font-weight: 700;
 }
 
-.product__discount__item__text .product__item__price span {
+.orig_price {
 	display: inline-block;
 	font-weight: 400;
 	text-decoration: line-through;
-	margin-left: 10px;
+	color: red;
+	animation: animate 5s linear infinite;
+  	animation-delay: 1s;
+}
+@keyframes animate {
+  0%,
+  18.1%,
+  20%,
+  55%,
+  60%,
+  90%,
+  92% {
+    color: red;
+    text-shadow: none;
+  }
+  18%,
+  20.1%,
+  55.1%,
+  60.2%,
+  90.1%,
+  92.2%,
+  100% {
+    color: #ffff;
+    text-shadow: 0 0 10px #red, 0 0 20px #red, 0 0 40px #red,
+      0 0 60px #red, 0 0 80px #red, 0 0 140px #red;
+  }
 }
 
 .product__discount__slider .col-lg-4 {
@@ -2549,7 +2574,7 @@ label:hover ~ input:checked ~ label{
 	border: none;
 	position: absolute;
 	right: 10px;
-	top: 236px;
+	top: 212px;
 	padding: 0px 18px;
 }
 
