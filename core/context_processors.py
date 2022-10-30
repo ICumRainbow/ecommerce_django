@@ -4,7 +4,7 @@ from django.db.models import Sum, F, ExpressionWrapper
 from django.contrib import messages
 
 from core.services import get_query_params
-from customer.models import Order, LikedProducts, OrderItems
+from customer.models import Order, LikedProduct, OrderItem
 from products.filters import ProductFilter
 from products.models import Category, Product
 from customer.forms import EmailSubForm
@@ -33,22 +33,17 @@ def retrieve_cart_items(request):
     else:
         order, created = Order.objects.get_or_create(session_id=session_id, completed=False)
 
-    order_items_query = OrderItems.objects.filter(order=order)
+    order_items_query = OrderItem.objects.filter(order=order)
     order_total_query = annotate_with_discount_prices(order_items_query)
     order_total_query = order_total_query.annotate(
         total_price=F('discount_price') * F('quantity'),
     ).aggregate(overall_price=Sum('total_price'))
 
     order_total = order_total_query['overall_price']
-    # print(overall_price)
-    # order_items = order_items_qs.only('product', 'quantity')
-    # order_total = 0
     items_count_query = order_items_query.aggregate(count=Sum('quantity'))
     items_count = items_count_query['count']
-    # for item in order_items:
-    #     order_total += float(item.product.current_price * item.quantity)
     context = {
-        'cart_items': items_count,
+        'cart_items': items_count or 0,
         'order_total': order_total or 0,
     }
 
@@ -60,7 +55,7 @@ def retrieve_liked_products(request):
     session_id = request.session.session_key
 
     query_kwargs = {'customer_id': customer_id} if request.user.is_authenticated else {'session_id': session_id}
-    liked_products_count = LikedProducts.objects.filter(**query_kwargs).count()
+    liked_products_count = LikedProduct.objects.filter(**query_kwargs).count()
 
     return {'liked_products': liked_products_count}
 

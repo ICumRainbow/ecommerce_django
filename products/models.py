@@ -11,16 +11,14 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
-
-    def __str__(self):
-        return self.name
+        indexes = [models.Index(fields=['id', 'name', 'image', 'description'])]
 
     @property
     def slugified_name(self):
         return ''.join(filter(str.isalnum, self.name))
 
-    def child_products(self):
-        return self.products.all()
+    def __str__(self):
+        return self.name
 
 
 class Product(models.Model):
@@ -34,8 +32,10 @@ class Product(models.Model):
     discount_rate = models.DecimalField('Discount rate', max_digits=5, decimal_places=2, null=True, default=0)
     created_at = models.DateTimeField('Created at', default=datetime.now)
 
-    def __str__(self):
-        return self.name
+    class Meta:
+        verbose_name = 'Product'
+        verbose_name_plural = 'Products'
+        indexes = [models.Index(fields=['id', 'name', 'price', 'category_id', 'image', 'description', 'in_stock', 'created_at', 'discount', 'discount_rate'])]
 
     @property
     def current_price(self) -> float:
@@ -43,4 +43,5 @@ class Product(models.Model):
             return round(self.price * (100 - self.discount_rate) / 100, 2)
         return float(self.price)
 
-
+    def __str__(self):
+        return self.name

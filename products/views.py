@@ -1,25 +1,26 @@
 import json
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count, Avg
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 
 from django.views.decorators.csrf import csrf_exempt
 
-from core.services import get_query_params, save_review_form, get_reviews, get_or_create_order, save_checkout_form
+from core.services import save_review_form, get_reviews, get_or_create_order, save_checkout_form
 from customer.forms import CheckoutForm, ReviewForm
 from posts.models import Post
-from customer.models import OrderItems, LikedProducts
+from customer.models import OrderItem, LikedProduct
 from products.models import Product
 from .filters import ProductFilter
 
 
 def index(request):
     # single request to the database to retrieve products and categories
-    products = Product.objects.select_related('category').annotate(num_likes=Count('likedproducts'),
-                                                                   reviews=Avg('productreviews__rating'))
+    products = Product.objects.select_related('category').annotate(num_likes=Count('likedproduct'),
+                                                                   reviews=Avg('productreview__rating'))
 
     featured_products = products.order_by('-created_at')
     products_by_likes = products.order_by('-num_likes')
@@ -42,15 +43,17 @@ def product_details(request, id_):
     related_products = Product.objects.filter(category_id=product.category).exclude(id=id_)
 
     reviews, reviews_numbers, product.average_review, product.count_reviews = get_reviews(product)
-    if request.method == 'POST':
-        review_form = ReviewForm(request.POST)
-        save_review_form(request, review_form, product)
+    if request.method == 'POST' and save_review_form(request, ReviewForm(request.POST), product):
+        return HttpResponseRedirect(request.path_info)
+    else:
+        # здесь надо разобраться
+        messages.success(request, 'You need to put at least 0.5 rating and type a review!')
+        review_form = ReviewForm()
 
-    review_form = ReviewForm()
     # getting the current order to retrieve the current product's quantity
     order, items = get_or_create_order(request)
     # getting product's quantity if it is present in the order
-    item = order.orderitems_set.filter(product_id=id_)
+    item = order.orderitem_set.filter(product_id=id_)
     product.quantity = item[0].quantity if item else 0
 
     context = {
@@ -90,7 +93,7 @@ def update_item_view(request):
     product = Product.objects.get(id=product_id)
     order, items = get_or_create_order(request)
     # getting or creating an item in the order to change its quantity
-    item, created = OrderItems.objects.get_or_create(order=order, product=product)
+    item, created = OrderItem.objects.get_or_create(order=order, product=product)
 
     if action == 'add':
         item.quantity += 1
@@ -103,7 +106,7 @@ def update_item_view(request):
         order.save()
         return JsonResponse({'result': 'Success!'}, status=200)
 
-    elif action == 'remove':
+    elif action == 'decrement':
         item.quantity -= 1
         item.save()
         order.save()
@@ -126,7 +129,7 @@ def like_item_view(request):
         kwargs = {'customer_id': customer_id, 'product_id': product_id} if customer_id else {
             'session_id': session_id, 'product_id': product_id}
         # gets a queryset with a product in case it was already liked, empty queryset otherwise
-        liked_products = LikedProducts.objects.filter(**kwargs)
+        liked_products = LikedProduct.objects.filter(**kwargs)
 
         if not liked_products:
             liked_products.create(**kwargs)
@@ -173,7 +176,7 @@ def liked_products_view(request):
 
     order, order_items = get_or_create_order(request)
     liked_products_kwargs = {'customer_id': customer_id} if customer_id else {'session_id': session_id}
-    liked_products = LikedProducts.objects.select_related('product').filter(**liked_products_kwargs)
+    liked_products = LikedProduct.objects.select_related('product').filter(**liked_products_kwargs)
 
     # if a liked product is also in customer's cart, we will display its quantity
     order_items_quantities = {item.product.id: item.quantity for item in order_items}

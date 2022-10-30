@@ -58,7 +58,7 @@
                         <div class="product__details__quantity">
                             <div class="quantity">
                                 <div class="pro-qty">
-                                    <span data-product="{{ product.id }}" data-action="remove" class="dec qtybtn update-cart">-</span>
+                                    <span data-product="{{ product.id }}" data-action="decrement" class="dec qtybtn update-cart">-</span>
                                     <input type="text" value="{{ product.quantity }}">
                                     <span data-product="{{ product.id }}" data-action="add" class="inc qtybtn update-cart">+</span>
                                 </div>
@@ -111,7 +111,7 @@
                                         {% if not user.is_authenticated %}
                                             <p>Please <a href="{% url 'login' %}">login</a> to submit a review.</p>
                                         {% else %}
-                                            <form action="" method="POST">
+                                            <form action="{% url 'product_details' product.id %}" method="POST">
                                                 {% csrf_token %}
                                                 <div class="rate">
                                                     <input type="radio" name="rating" id="rating10" value="5" required /><label for="rating10" title="5"></label>
@@ -125,7 +125,9 @@
                                                     <input type="radio" name="rating" id="rating2" value="1" required /><label for="rating2" title="1"></label>
                                                     <input type="radio" name="rating" id="rating1" value="0.5" required /><label for="rating1" title="0.5" class="half"></label>
                                                 </div>
-                                                {{ review_form.review }} <br>
+                                                <textarea cols="30" rows="7" class="form-control" id="{{ review_form.review.id_for_label }}" name="{{ review_form.review.html_name }}"></textarea>
+{#                                                {{ review_form.review }} #}
+                                                <br>
                                                 <button type="submit" class="primary-btn">Submit</button>
                                             </form>
                                         {% endif %}

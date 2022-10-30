@@ -10,6 +10,7 @@ class PostCategory(models.Model):
     class Meta:
         verbose_name = 'Post Category'
         verbose_name_plural = 'Post Categories'
+        indexes = [models.Index(fields=['id', 'name', 'description'])]
 
     def __str__(self):
         return self.name
@@ -22,7 +23,12 @@ class Post(models.Model):
     picture = models.ImageField('Image', default='product-1.jpg')
     content = models.TextField('Content')
     created_at = models.DateTimeField('Created at', default=datetime.now)
-    category = models.ForeignKey(to=PostCategory, on_delete=models.CASCADE, default='', related_name='posts')
+    category = models.ForeignKey(to=PostCategory, verbose_name='Category', on_delete=models.CASCADE, default='', related_name='posts')
+
+    class Meta:
+        verbose_name = 'Post'
+        verbose_name_plural = 'Posts'
+        indexes = [models.Index(fields=['id', 'author', 'heading', 'picture', 'content', 'created_at', 'category_id', 'avatar'])]
 
     def __str__(self):
         return self.heading

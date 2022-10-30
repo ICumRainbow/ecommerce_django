@@ -198,7 +198,7 @@
                         </div>
                         <ul>
                             {% for category in categories %}
-                            <li><a href="{% url 'shop_grid' %}{% my_url category.id 'category' request.GET.urlencode %}">{{ category.name }}</a></li>
+                            <li><a href="{% url 'shop_grid' %}{% append_to_url category.id 'category' %}">{{ category.name }}</a></li>
                             {% endfor %}
                         </ul>
                     </div>
