@@ -35,13 +35,9 @@
 <div id="preloder">
     <div class="loader"></div>
 </div>
-{% if messages %}
-{% for message in messages %}
-<div class="alert alert-warning alert-dismissible fade show position-absolute" id="message" role="alert">
-    {{ message }}
-</div>
-{% endfor %}
-{% endif %}
+{#<div class="alert alert-warning alert-dismissible fade show position-absolute" id="message" role="alert">#}
+    {% include 'message.html' %}
+{#</div>#}
 <!-- Humberger Begin -->
 <div class="humberger__menu__overlay"></div>
 <div class="humberger__menu__wrapper">
@@ -331,6 +327,7 @@
 <script src="{% static 'js/cart.js' %}"></script>
 <script src="{% static 'js/like.js' %}"></script>
 <script src="{% static 'js/script.js' %}"></script>
+<script src="{% static 'js/message.js' %}"></script>
 
 </body>
 </html>
