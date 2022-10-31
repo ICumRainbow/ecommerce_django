@@ -37,11 +37,8 @@ def save_review_form(request, form, product) -> bool:
         return False
 
 
-def save_checkout_form(request, items, form, order) -> bool:
+def save_checkout_form(request, form, order) -> bool:
     if request.method == 'POST':
-        if not items:
-            messages.success(request, 'You have no items in your cart!')
-            return False
         if form.is_valid():
             checkout: ShippingDetails = form.save(commit=False)
             checkout.customer_id = request.user.id

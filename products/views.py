@@ -154,11 +154,16 @@ def cart_view(request):
 @login_required(login_url='login')
 def checkout_view(request):
     order, items = get_or_create_order(request)
-    for item in items:
-        item.total = item.product.current_price * item.quantity
+    if not items:
+        messages.success(request, 'You have no items in your cart!')
+        return redirect('shop_grid')
+    else:
+        for item in items:
+            item.total = item.product.current_price * item.quantity
+
     checkout_form = CheckoutForm(request.POST)
 
-    if save_checkout_form(request, items, checkout_form, order) is True:
+    if save_checkout_form(request, checkout_form, order) is True:
         return redirect('index')
 
     context = {
