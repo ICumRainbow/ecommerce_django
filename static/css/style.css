@@ -307,6 +307,11 @@ label:hover ~ input:checked ~ label{
   color: #ffb503 !important;
 }
 
+.no-rating{
+	color: #999999;
+	opacity: 0.5;
+}
+
 
 
 /*---------------------
@@ -2001,7 +2006,7 @@ label:hover ~ input:checked ~ label{
 }
 
 .product__details__tab .product__details__tab__desc p {
-	color: #666666;
+	color: #101010;
 }
 
 /*---------------------

@@ -23,6 +23,7 @@ def get_reviews(product) -> tuple:
 
 
 def save_review_form(request, form, product) -> bool:
+    print(form.errors.as_data)
     if request.method == 'POST':
         if form.is_valid():
             review: ProductReview = form.save(commit=False)

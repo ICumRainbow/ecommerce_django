@@ -19,7 +19,7 @@ class CheckoutForm(forms.ModelForm):
 
 
 class ReviewForm(forms.ModelForm):
-    # review = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
+    rating = forms.FloatField(required=False)
 
     class Meta:
         model = ProductReview

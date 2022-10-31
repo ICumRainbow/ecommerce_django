@@ -97,6 +97,7 @@
                                         <h6>Reviews</h6>
                                         {% for review in reviews %}
                                             <span>{{ review.customer.username }}, on {% format_date review.date_written True %}</span>
+                                            {% if review.rating %}
                                             <div class="rating-star">
                                                 <span>
                                                     <i class="fa fa-star{% if review.rating == 0.5 %}-half-o{% elif review.rating < 1 %}-o {% endif %}" aria-hidden="true"></i>
@@ -106,6 +107,11 @@
                                                     <i class="fa fa-star{% if review.rating == 4.5 %}-half-o{% elif review.rating < 5 %}-o {% endif %}" aria-hidden="true"></i>
                                                 </span>
                                             </div>
+                                            {% else %}
+                                                <div class="rating-star">
+                                                    <span class="no-rating">No rating</span>
+                                                </div>
+                                            {% endif %}
                                             <p>{{ review.review }}</p>
                                         {% endfor %}
                                         {% if not user.is_authenticated %}
@@ -113,19 +119,19 @@
                                         {% else %}
                                             <form action="{% url 'product_details' product.id %}" method="POST">
                                                 {% csrf_token %}
-                                                <div class="rate">
-                                                    <input type="radio" name="rating" id="rating10" value="5" required /><label for="rating10" title="5"></label>
-                                                    <input type="radio" name="rating" id="rating9" value="4.5" required /><label for="rating9" title="4.5" class="half"></label>
-                                                    <input type="radio" name="rating" id="rating8" value="4" required /><label for="rating8" title="4"></label>
-                                                    <input type="radio" name="rating" id="rating7" value="3.5" required /><label for="rating7" title="3.5" class="half"></label>
-                                                    <input type="radio" name="rating" id="rating6" value="3" required /><label for="rating6" title="3"></label>
-                                                    <input type="radio" name="rating" id="rating5" value="2.5" required /><label for="rating5" title="2.5" class="half"></label>
-                                                    <input type="radio" name="rating" id="rating4" value="2" required /><label for="rating4" title="2"></label>
-                                                    <input type="radio" name="rating" id="rating3" value="1.5" required /><label for="rating3" title="1.5" class="half"></label>
-                                                    <input type="radio" name="rating" id="rating2" value="1" required /><label for="rating2" title="1"></label>
-                                                    <input type="radio" name="rating" id="rating1" value="0.5" required /><label for="rating1" title="0.5" class="half"></label>
+                                                <div class="rate" aria-required="true">
+                                                    <input type="radio" name="rating" id="rating10" value="5" /><label for="rating10" title="5"></label>
+                                                    <input type="radio" name="rating" id="rating9" value="4.5" /><label for="rating9" title="4.5" class="half"></label>
+                                                    <input type="radio" name="rating" id="rating8" value="4" /><label for="rating8" title="4"></label>
+                                                    <input type="radio" name="rating" id="rating7" value="3.5" /><label for="rating7" title="3.5" class="half"></label>
+                                                    <input type="radio" name="rating" id="rating6" value="3" /><label for="rating6" title="3"></label>
+                                                    <input type="radio" name="rating" id="rating5" value="2.5" /><label for="rating5" title="2.5" class="half"></label>
+                                                    <input type="radio" name="rating" id="rating4" value="2" /><label for="rating4" title="2"></label>
+                                                    <input type="radio" name="rating" id="rating3" value="1.5" /><label for="rating3" title="1.5" class="half"></label>
+                                                    <input type="radio" name="rating" id="rating2" value="1" /><label for="rating2" title="1"></label>
+                                                    <input type="radio" name="rating" id="rating1" value="0.5" /><label for="rating1" title="0.5" class="half"></label>
                                                 </div>
-                                                <textarea cols="30" rows="7" class="form-control" id="{{ review_form.review.id_for_label }}" name="{{ review_form.review.html_name }}"></textarea>
+                                                <textarea required cols="30" rows="7" class="form-control" id="{{ review_form.review.id_for_label }}" name="{{ review_form.review.html_name }}"></textarea>
 {#                                                {{ review_form.review }} #}
                                                 <br>
                                                 <button type="submit" class="primary-btn">Submit</button>

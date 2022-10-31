@@ -22,7 +22,7 @@ class User(AbstractUser):
 
 
 class Order(models.Model):
-    customer = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True, blank=True)
+    customer = models.ForeignKey(to=User, verbose_name='Customer', on_delete=models.SET_NULL, null=True, blank=True)
     date_ordered = models.DateTimeField('Date ordered', auto_now_add=True)
     completed = models.BooleanField('Completed', default=False)
     session = models.ForeignKey(to='sessions.Session', on_delete=models.SET_NULL, null=True, blank=True)
@@ -49,8 +49,8 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    product = models.ForeignKey(to=Product, on_delete=models.SET_NULL, null=True)
-    order = models.ForeignKey(to=Order, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(to=Product, verbose_name='Product', on_delete=models.SET_NULL, null=True)
+    order = models.ForeignKey(to=Order, verbose_name='Order', on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField('Quantity', default=0, null=True, blank=True)
     date_added = models.DateTimeField('Date added', auto_now_add=True)
 
@@ -70,9 +70,9 @@ class OrderItem(models.Model):
 
 
 class LikedProduct(models.Model):
-    customer = models.ForeignKey(to=User, on_delete=models.CASCADE, null=True)
-    session = models.ForeignKey(to='sessions.Session', on_delete=models.SET_NULL, null=True)
-    product = models.ForeignKey(to=Product, on_delete=models.CASCADE, null=False)
+    customer = models.ForeignKey(to=User, verbose_name='Customer', on_delete=models.CASCADE, null=True)
+    session = models.ForeignKey(to='sessions.Session', verbose_name='Session', on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(to=Product, verbose_name='Product', on_delete=models.CASCADE, null=False)
 
     class Meta:
         verbose_name = 'Liked Product'
@@ -85,9 +85,9 @@ class LikedProduct(models.Model):
 
 class ProductReview(models.Model):
     review = models.TextField('Review', blank=False, null=False)
-    customer = models.ForeignKey(to=User, on_delete=models.CASCADE)
-    product = models.ForeignKey(to=Product, on_delete=models.CASCADE)
-    rating = models.FloatField('Rating')
+    customer = models.ForeignKey(to=User, verbose_name='Customer', on_delete=models.CASCADE)
+    product = models.ForeignKey(to=Product, verbose_name='Product', on_delete=models.CASCADE)
+    rating = models.FloatField('Rating', null=True)
     date_written = models.DateTimeField('Date written', auto_now_add=True)
 
     class Meta:
