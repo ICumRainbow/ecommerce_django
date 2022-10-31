@@ -17,7 +17,7 @@ from products.models import Product
 from .filters import ProductFilter
 
 
-def index(request):
+def index_view(request):
     # single request to the database to retrieve products and categories
     products = Product.objects.select_related('category').annotate(num_likes=Count('likedproduct'),
                                                                    reviews=Avg('productreview__rating'))
@@ -38,7 +38,7 @@ def index(request):
     return render(request, 'index.html', context)
 
 
-def product_details(request, id_):
+def product_details_view(request, id_):
     product = get_object_or_404(Product.objects.select_related('category'), id=id_)
     related_products = Product.objects.filter(category_id=product.category).exclude(id=id_)
 
@@ -47,7 +47,6 @@ def product_details(request, id_):
         return HttpResponseRedirect(request.path_info)
     else:
         # здесь надо разобраться
-        messages.success(request, 'You need to put at least 0.5 rating and type a review!')
         review_form = ReviewForm()
 
     # getting the current order to retrieve the current product's quantity
@@ -66,7 +65,7 @@ def product_details(request, id_):
     return render(request, 'product-details.html', context)
 
 
-def shop_grid(request):
+def shop_grid_view(request):
     products = Product.objects.select_related('category').order_by('-created_at')
     products_with_discount = products.filter(discount=True)
 
@@ -141,7 +140,7 @@ def like_item_view(request):
         return JsonResponse({'detail': f'Unknown action {action}'}, status=400)
 
 
-def cart(request):
+def cart_view(request):
     order, items = get_or_create_order(request)
     # getting current price (with or without discount) of a product and multiplying it its quantity in the current order
     for item in items:

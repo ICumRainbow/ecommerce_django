@@ -5,7 +5,7 @@ from posts.filters import PostFilter
 from posts.models import Post, PostCategory
 
 
-def blog(request):
+def blog_view(request):
     categories = PostCategory.objects.all()
     posts_by_date = Post.objects.order_by('-created_at')
     post_heading = request.GET.get('heading', '')
@@ -29,7 +29,7 @@ def blog(request):
     return render(request, 'blog.html', context)
 
 
-def post_details(request, id_):
+def post_details_view(request, id_):
     categories = PostCategory.objects.all()
     post = Post.objects.get(id=id_)
     posts_by_date = Post.objects.order_by('-created_at')

@@ -67,3 +67,22 @@ def get_or_create_order(request) -> tuple:
     order, created = Order.objects.get_or_create(**order_kwargs)
     items = OrderItem.objects.select_related('product').filter(order=order)
     return order, items
+
+
+# getting items from the order when user is not registered
+def get_current_order_items(request):
+    order = Order.objects.get(session_id=request.session.session_key)
+    order_items = OrderItem.objects.filter(order=order)
+    return order, order_items
+
+
+# transferring the items to order of a newly registered user
+def transfer_order_items(request, user, order_items):
+    session_id = request.session.session_key
+
+    order_kwargs = {'customer': user, 'completed': False} if request.user.id else {'session_id': session_id, 'completed': False}
+    order, created = Order.objects.get_or_create(**order_kwargs)
+    order.session_id = session_id
+
+    for item in order_items:
+        OrderItem.objects.get_or_create(order=order, product=item.product, quantity=item.quantity)

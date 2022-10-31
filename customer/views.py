@@ -2,30 +2,13 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.shortcuts import render, redirect
 
+from core.services import get_current_order_items, transfer_order_items
 from .forms import CustomUserCreationForm, ContactForm
 from .models import Order, OrderItem
 
 
-# getting items from the order when user is not registered
-def get_current_order_items(request):
-    order = Order.objects.get(session_id=request.session.session_key)
-    order_items = OrderItem.objects.filter(order=order)
-    return order, order_items
 
-
-# transferring the items to order of a newly registered user
-def transfer_order_items(request, user, order_items):
-    session_id = request.session.session_key
-
-    order_kwargs = {'customer': user, 'completed': False} if request.user.id else {'session_id': session_id, 'completed': False}
-    order, created = Order.objects.get_or_create(**order_kwargs)
-    order.session_id = session_id
-
-    for item in order_items:
-        OrderItem.objects.get_or_create(order=order, product=item.product, quantity=item.quantity)
-
-
-def register(request):
+def register_view(request):
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
         # we get the items user could've added to the cart before registering
