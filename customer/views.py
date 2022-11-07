@@ -2,39 +2,42 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.shortcuts import render, redirect
 
-from core.services import get_current_order_items, transfer_order_items
 from .forms import CustomUserCreationForm, ContactForm
-from .models import Order, OrderItem
-
+from .services import get_current_order_items, transfer_order_items, get_or_create_order_for_login
 
 
 def register_view(request):
+    """
+    View for registration.
+    """
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
         # we get the items user could've added to the cart before registering
-        order, order_items = get_current_order_items(request)
+        _, order_items = get_current_order_items(request)
         if form.is_valid():
             user = form.save()
             login(request, user)
             # transferring the items got from the get_current_order_items function to the newly registered user's order
             transfer_order_items(request, user, order_items)
-            order.customer = user
             messages.success(request, 'Success!')
             return redirect('/')
     else:
         form = CustomUserCreationForm()
     context = {'form': form}
 
-    return render(request, 'register.html', context)
+    return render(request, 'customer/register.html', context)
 
 
 def login_view(request):
+    """
+    View for logging in.
+    """
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            Order.objects.get_or_create(customer_id=user.id, completed=False, session_id=None)
+            get_or_create_order_for_login(user)
             login(request, user)
             messages.success(request, "You've logged in successfully!")
             return redirect('index')
@@ -42,10 +45,13 @@ def login_view(request):
             messages.success(request, "There was an error logging in, try again!")
             return redirect('login')
     else:
-        return render(request, 'login.html')
+        return render(request, 'customer/login.html')
 
 
 def logout_view(request):
+    """
+    View for logging out.
+    """
     logout(request)
     messages.success(request, 'You were logged out!')
     # redirecting to the current page
@@ -53,6 +59,9 @@ def logout_view(request):
 
 
 def contact_view(request):
+    """
+    View for contact page.
+    """
     form = ContactForm(request.POST)
     # because there can be two POST forms on one page (EmailSub form), we specify the IF condition
     if request.method == 'POST' and 'name' in request.POST:
@@ -67,4 +76,4 @@ def contact_view(request):
         "form": form,
     }
 
-    return render(request, 'contact.html', context)
+    return render(request, 'customer/contact.html', context)

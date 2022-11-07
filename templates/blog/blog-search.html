@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'utility/base.html' %}
 {% load tags %}
 {% load static %}
 <body>
@@ -44,7 +44,7 @@
                     {% endif %}
                         <div class="col-lg-12">
                             {% if page_obj %}
-                                {% include "pagination.html" %}
+                                {% include "utility/pagination.html" %}
                             {% endif %}
                         </div>
                     </div>
