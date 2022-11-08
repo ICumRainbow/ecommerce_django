@@ -36,7 +36,7 @@
 
             <p class="account__register">Don't have an account yet? Click <a href="{% url 'register' %}">register</a> to
                 create one! Items in your cart will not get lost!</p>
-            <form action="{% url 'login' %}" method=POST>
+            <form action="" method=POST>
                 {% csrf_token %}
                 <div class="row">
                     <div class="col-lg-8 col-sm-6 login_form">
