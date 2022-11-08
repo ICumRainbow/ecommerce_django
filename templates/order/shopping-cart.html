@@ -42,8 +42,8 @@
                                 {% for item in items %}
                                 <tr>
                                     <td class="shoping__cart__item">
-                                        <img src="{{ item.product.image.url }}" alt="">
-                                        <h5>{{ item.product.name }}</h5>
+                                        <img onclick="location.href='{% url 'product_details' item.product.id %}'" style="cursor: pointer" src="{{ item.product.image.url }}" alt="">
+                                        <h5><a href="{% url 'product_details' item.product.id %}">{{ item.product.name }}</a></h5>
                                     </td>
                                     <td class="shoping__cart__price">
                                         ${{ item.product.current_price }}

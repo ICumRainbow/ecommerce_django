@@ -2144,6 +2144,13 @@ label:hover ~ input:checked ~ label{
 	display: inline-block;
 }
 
+.shoping__cart__table table tbody tr td.shoping__cart__item h5 a {
+	color: #1c1c1c;
+}
+.shoping__cart__table table tbody tr td.shoping__cart__item h5 a:hover {
+	color: gray;
+}
+
 .shoping__cart__table table tbody tr td.shoping__cart__price {
 	font-size: 18px;
 	color: #1c1c1c;
@@ -2453,6 +2460,13 @@ label:hover ~ input:checked ~ label{
 .checkout__order ul li span {
 	font-weight: 700;
 	float: right;
+}
+
+.checkout__order ul li a {
+	color: dimgray;
+}
+.checkout__order ul li a:hover {
+	color: gray;
 }
 
 .checkout__order .checkout__order__subtotal {

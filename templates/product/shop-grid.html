@@ -93,7 +93,7 @@
                             {% for product in products_with_discount %}
                             <div class="col-lg-4">
                                 <div class="product__discount__item">
-                                    <div class="product__discount__item__pic set-bg"
+                                    <div onclick="location.href='{% url 'product_details' product.id %}'" style="cursor: pointer" class="product__discount__item__pic set-bg"
                                          data-setbg="{{ product.image.url }}">
                                         <div class="product__discount__percent">-{{ product.discount_rate|stringformat:"d" }}%
                                         </div>
@@ -125,7 +125,7 @@
                     {% for product in page %}
                     <div class="col-lg-4 col-md-6 col-sm-6">
                         <div class="product__item ">
-                            <div class="product__item__pic set-bg" data-setbg="{{ product.image.url }}">
+                            <div onclick="location.href='{% url 'product_details' product.id %}'" style="cursor: pointer" class="product__item__pic set-bg" data-setbg="{{ product.image.url }}">
                                 <ul class="product__item__pic__hover">
                                     <li><a data-product="{{ product.id }}" data-action="like" class="like-product"><i class="fa fa-heart"></i></a></li>
                                     <li><a data-product="{{ product.id }}" data-action="add" class="update-cart"><i class="fa fa-shopping-cart"></i></a></li>
