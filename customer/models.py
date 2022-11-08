@@ -15,7 +15,9 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
-        indexes = [models.Index(fields=['id', 'password', 'last_login', 'is_superuser', 'first_name', 'last_name', 'is_staff', 'is_active', 'date_joined', 'username', 'email', 'phone'])]
+        indexes = [models.Index(
+            fields=['id', 'password', 'last_login', 'is_superuser', 'first_name', 'last_name', 'is_staff', 'is_active',
+                    'date_joined', 'username', 'email', 'phone'])]
 
     def __str__(self):
         return self.username
@@ -45,7 +47,11 @@ class Order(models.Model):
         return total
 
     def __str__(self):
-        return str(self.id)
+        if self.customer:
+            customer = self.customer.username
+        else:
+            customer = "Anonymous user"
+        return "Order number: " + str(self.id) + f", Customer: {customer}," + " Finished - " + str(self.completed)
 
 
 class OrderItem(models.Model):
@@ -80,7 +86,11 @@ class LikedProduct(models.Model):
         indexes = [models.Index(fields=['id', 'customer_id', 'product_id', 'session_id'])]
 
     def __str__(self):
-        return self.product.name
+        if self.customer:
+            customer = self.customer.username
+        else:
+            customer = "Anonymous user"
+        return f'{customer}, {self.product.name}'
 
 
 class ProductReview(models.Model):
@@ -96,7 +106,7 @@ class ProductReview(models.Model):
         indexes = [models.Index(fields=['id', 'review', 'customer_id', 'product_id', 'date_written', 'rating'])]
 
     def __str__(self):
-        return f'{self.customer}, {self.product.name},{self.rating}'
+        return f'Customer: {self.customer}, Product: {self.product.name}, Rating: {self.rating}'
 
 
 class ShippingDetails(models.Model):
@@ -117,7 +127,12 @@ class ShippingDetails(models.Model):
         verbose_name_plural = 'Shipping Details'
 
     def __str__(self):
-        return f'{self.customer.username} - {self.order_id}'
+        if self.payment_type == 1:
+            payment_type = 'PayMe'
+        else:
+            payment_type = 'Click'
+        return f'Customer: {self.customer.username}, Payment method: {payment_type}, Order #: {self.order_id}, ' \
+               f'State: {self.state}, City: {self.city}, Address: {self.address}, Zipcode: {self.zipcode} '
 
 
 class EmailSubscription(models.Model):
