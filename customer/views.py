@@ -32,20 +32,21 @@ def login_view(request):
     """
     View for logging in.
     """
-    previous_page = request.GET['next']
-    print(previous_page)
+    print(request.GET)
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
+            previous_page = request.GET['next']
+            print(previous_page)
             get_or_create_order_for_login(user)
             login(request, user)
             messages.success(request, "You've logged in successfully!")
             return redirect(previous_page)
         else:
             messages.success(request, "There was an error logging in, try again!")
-            return redirect('login')
+            return render(request, 'customer/login.html')
     else:
         return render(request, 'customer/login.html')
 

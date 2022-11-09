@@ -71,11 +71,9 @@ def get_all_products():
     Getting products sorted by date, likes, reviews and discount.
     """
     # single request to the database to retrieve products and categories
-    products = Product.objects.select_related('category').annotate(num_likes=Count('likedproduct'),
-                                                                   reviews=Avg('productreview__rating')).order_by(
-        '-created_at')
-    products_by_likes = products.order_by('-num_likes')
-    products_by_reviews = products.order_by('-reviews')
+    products = Product.objects.select_related('category').order_by('-created_at')
+    products_by_likes = products.annotate(num_likes=Count('likedproduct')).order_by('-num_likes')
+    products_by_reviews = products.annotate(reviews=Avg('productreview__rating')).order_by('-reviews')
     products_with_discount = products.filter(discount=True)
 
     return products, products_by_likes, products_by_reviews, products_with_discount
