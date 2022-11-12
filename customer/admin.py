@@ -1,11 +1,11 @@
 from django.contrib import admin
 from django.db.models import F
 
-from products.models import Product
 from .models import User, Order, OrderItem, ShippingDetails, LikedProduct, ProductReview, EmailSubscription, \
     ContactMessage
 
-admin.site.register(User)
+
+# admin.site.register(User)
 
 
 # admin.site.register(Order)
@@ -19,8 +19,19 @@ admin.site.register(User)
 # admin.site.register(ContactMessage)
 
 
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    """
+    Model to display users in admin panel.
+    """
+    list_display = ("username",)
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    """
+    Model to display orders in admin panel
+    """
     list_display = ("id", "get_customer_username", "completed")
 
     @admin.display(description="Customer", ordering="customer")
@@ -33,6 +44,9 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
+    """
+    Model to display order items in admin panel.
+    """
     list_display = ("get_product", "order", "get_customer_username")
 
     @admin.display(description="Customer", ordering="order__customer")
@@ -52,6 +66,9 @@ class OrderItemAdmin(admin.ModelAdmin):
 
 @admin.register(ShippingDetails)
 class ShippingDetailsAdmin(admin.ModelAdmin):
+    """
+    Model to display shipping details in admin panel.
+    """
     list_display = ("customer", "payment_type", "state", "city", "address", "zipcode")
 
     @admin.display(empty_value="???", ordering="payment_type")
@@ -65,6 +82,9 @@ class ShippingDetailsAdmin(admin.ModelAdmin):
 
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
+    """
+    Model to display contact messages in admin panel.
+    """
     list_display = ("get_name", "get_email")
 
     @admin.display(description="Name", ordering="name")
@@ -78,6 +98,9 @@ class ContactMessageAdmin(admin.ModelAdmin):
 
 @admin.register(LikedProduct)
 class LikedProductAdmin(admin.ModelAdmin):
+    """
+    Model to display liked products in admin panel.
+    """
     list_display = ("customer_username", "product_name")
 
     @admin.display(description="Customer", ordering="customer")
@@ -95,9 +118,27 @@ class LikedProductAdmin(admin.ModelAdmin):
 
 @admin.register(ProductReview)
 class ProductReviewAdmin(admin.ModelAdmin):
-    list_display = ("product", "rating", "customer")
+    """
+    Model to display product reviews in admin panel.
+    """
+    list_display = ("get_product", "rating", "get_customer")
+
+    @admin.display(description="Product", ordering="product__name")
+    def get_product(self, obj):
+        return obj.product
+
+    @admin.display(description="Customer", ordering="customer__username")
+    def get_customer(self, obj):
+        return obj.customer
 
 
 @admin.register(EmailSubscription)
 class EmailSubscriptionAdmin(admin.ModelAdmin):
-    list_display = ("email",)
+    """
+    Model to display email subscriptions in admin panel.
+    """
+    list_display = ("get_email",)
+
+    @admin.display(ordering="email", empty_value="?")
+    def get_email(self, obj):
+        return obj.email

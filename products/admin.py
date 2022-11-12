@@ -21,6 +21,7 @@ class ProductAdmin(admin.ModelAdmin):
         "name", "get_category", "get_formatted_price", "get_discount_price", "get_discount_percentage",
         "get_number_of_likes",
         "get_average_rating")
+    list_filter = ("category",)
 
     @admin.display(description="Category", ordering="category__name")
     def get_category(self, obj):
@@ -69,6 +70,7 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ("name", "get_products")
+    list_filter = ("name",)
 
     @admin.display(description="Products")
     def get_products(self, obj, products=Product.objects.all()):
@@ -83,17 +85,19 @@ class CategoryAdmin(admin.ModelAdmin):
         child_products_with_links = []
 
         for product, _id in zip(child_products, child_products_ids):
-            _id = str(_id)
             url = (
                     "http://127.0.0.1:8000/admin/products/product/"
-                    + _id
+                    + str(_id)
                     + "/change/"
             )
             product = f'<a href="{url}">{product}</a>'
             child_products_with_links.append(product)
         if len(child_products) < 6:
-            return format_html(", ".join(child_products_with_links))
+            return format_html(" ,&nbsp;&nbsp;".join(child_products_with_links))
         else:
-            first_five_child_products = ", ".join(child_products_with_links[:5])
-            return format_html(first_five_child_products + f"...({len(child_products)})")
-
+            category_url = (
+                "http://127.0.0.1:8000/admin/products/product/?category__id__exact=" + str(obj.id)
+            )
+            category_link = f'<a href="{category_url}">{len(child_products)}</a>'
+            first_five_child_products = " ,&nbsp;&nbsp;".join(child_products_with_links[:5])
+            return format_html(first_five_child_products + f"...({category_link})")

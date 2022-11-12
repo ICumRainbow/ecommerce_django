@@ -32,14 +32,12 @@ def login_view(request):
     """
     View for logging in.
     """
-    print(request.GET)
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
             previous_page = request.GET['next']
-            print(previous_page)
             get_or_create_order_for_login(user)
             login(request, user)
             messages.success(request, "You've logged in successfully!")
