@@ -17,6 +17,9 @@ from .models import Product, Category
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    """
+    Model to display products in admin panel.
+    """
     list_display = (
         "name", "get_category", "get_formatted_price", "get_discount_price", "get_discount_percentage",
         "get_number_of_likes",
@@ -69,6 +72,9 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    """
+    Model to display product categories in admin panel.
+    """
     list_display = ("name", "get_products")
     list_filter = ("name",)
 

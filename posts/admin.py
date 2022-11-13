@@ -8,6 +8,9 @@ from .models import Post, PostCategory
 
 @admin.register(PostCategory)
 class PostCategoryAdmin(admin.ModelAdmin):
+    """
+    Model to display post categories in admin panel.
+    """
     list_display = ("name","get_posts")
     list_filter = ("name",)
 
@@ -45,6 +48,9 @@ class PostCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
+    """
+    Model to display posts in admin panel.
+    """
     list_display = ("heading", "get_category")
     list_filter = ("category",)
 

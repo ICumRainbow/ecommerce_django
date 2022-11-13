@@ -6,6 +6,9 @@ from products.models import Product, Category
 
 
 class ProductFilter(FilterSet):
+    """
+    Filter to search products by name, category and price.
+    """
     price = Product.objects.aggregate(
         price__min=Min((F('price') * (100 - F('discount_rate'))) / 100),
         price__max=Max((F('price') * (100 - F('discount_rate'))) / 100)

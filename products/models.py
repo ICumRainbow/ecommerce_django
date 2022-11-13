@@ -4,6 +4,9 @@ from django.db import models
 
 
 class Category(models.Model):
+    """
+    Model for product categories.
+    """
     name = models.CharField('Name', max_length=200)
     image = models.ImageField('Image', upload_to='media', default='cat-1.jpg')
     description = models.TextField('Description', default='')
@@ -22,6 +25,9 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    """
+    Model for products.
+    """
     name = models.CharField('Name', max_length=200)
     category = models.ForeignKey(to=Category, on_delete=models.CASCADE, related_name='products')
     price = models.DecimalField('Price', max_digits=5, decimal_places=2)
@@ -35,7 +41,9 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'Product'
         verbose_name_plural = 'Products'
-        indexes = [models.Index(fields=['id', 'name', 'price', 'category_id', 'image', 'description', 'in_stock', 'created_at', 'discount', 'discount_rate'])]
+        indexes = [models.Index(
+            fields=['id', 'name', 'price', 'category_id', 'image', 'description', 'in_stock', 'created_at', 'discount',
+                    'discount_rate'])]
 
     @property
     def current_price(self) -> float:

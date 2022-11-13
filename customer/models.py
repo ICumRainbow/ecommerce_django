@@ -5,6 +5,9 @@ from products.models import Product
 
 
 class User(AbstractUser):
+    """
+    Overriden model for users.
+    """
     username = models.CharField('Username', blank=False, max_length=100, unique=True)
     email = models.EmailField('Email', default=False, blank=False)
     phone = models.CharField('Phone', max_length=12)
@@ -24,6 +27,9 @@ class User(AbstractUser):
 
 
 class Order(models.Model):
+    """
+    Model for orders.
+    """
     customer = models.ForeignKey(to=User, verbose_name='Customer', on_delete=models.SET_NULL, null=True, blank=True)
     date_ordered = models.DateTimeField('Date ordered', auto_now_add=True)
     completed = models.BooleanField('Completed', default=False)
@@ -55,6 +61,9 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
+    """
+    Model for order items.
+    """
     product = models.ForeignKey(to=Product, verbose_name='Product', on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(to=Order, verbose_name='Order', on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField('Quantity', default=0, null=True, blank=True)
@@ -76,6 +85,9 @@ class OrderItem(models.Model):
 
 
 class LikedProduct(models.Model):
+    """
+    Model for liked products.
+    """
     customer = models.ForeignKey(to=User, verbose_name='Customer', on_delete=models.CASCADE, null=True)
     session = models.ForeignKey(to='sessions.Session', verbose_name='Session', on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(to=Product, verbose_name='Product', on_delete=models.CASCADE, null=False)
@@ -94,6 +106,9 @@ class LikedProduct(models.Model):
 
 
 class ProductReview(models.Model):
+    """
+    Model for product reviews.
+    """
     review = models.TextField('Review', blank=False, null=False)
     customer = models.ForeignKey(to=User, verbose_name='Customer', on_delete=models.CASCADE)
     product = models.ForeignKey(to=Product, verbose_name='Product', on_delete=models.CASCADE)
@@ -110,6 +125,10 @@ class ProductReview(models.Model):
 
 
 class ShippingDetails(models.Model):
+    """
+    Model for shipping details.
+    """
+
     class PaymentType(models.IntegerChoices):
         PAYME = 1, 'PayMe'
         CLICK = 2, 'Click'
@@ -136,6 +155,9 @@ class ShippingDetails(models.Model):
 
 
 class EmailSubscription(models.Model):
+    """
+    Model for email subscriptions.
+    """
     email = models.EmailField('Email', unique=True)
 
     class Meta:
@@ -147,6 +169,9 @@ class EmailSubscription(models.Model):
 
 
 class ContactMessage(models.Model):
+    """
+    Model for contact messages.
+    """
     name = models.CharField('Name', max_length=30, null=False)
     contact_email = models.EmailField('Email')
     message = models.TextField('Message', max_length=200, null=False)

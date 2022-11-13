@@ -1,29 +1,17 @@
-from django.core.paginator import Paginator
-from django.db import models
-from django.db.models import Sum, F, ExpressionWrapper
 from django.contrib import messages
+from django.db.models import Sum, F
 
-from core.services import get_query_params
+from core.services import get_query_params, annotate_with_discount_prices
+from customer.forms import EmailSubForm
 from customer.models import Order, LikedProduct, OrderItem
 from products.filters import ProductFilter
 from products.models import Category, Product
-from customer.forms import EmailSubForm
-
-
-def annotate_with_discount_prices(queryset: models.QuerySet):
-    return queryset.annotate(
-        discount_percent=ExpressionWrapper(
-            (100 - F('product__discount_rate')) / 100.0,
-            output_field=models.FloatField()
-        ),
-        discount_price=ExpressionWrapper(
-            F('product__price') * F('discount_percent'),
-            output_field=models.FloatField()
-        )
-    )
 
 
 def retrieve_cart_items(request):
+    """
+    Retrieves number of items in the cart and their total price.
+    """
     customer = request.user.id
     session_id = request.session.session_key
     if request.user.is_authenticated:
@@ -51,6 +39,9 @@ def retrieve_cart_items(request):
 
 
 def retrieve_liked_products(request):
+    """
+    Retrieves number of liked products.
+    """
     customer_id = request.user.id
     session_id = request.session.session_key
 
@@ -61,6 +52,9 @@ def retrieve_liked_products(request):
 
 
 def retrieve_filter_form(request):
+    """
+    Retrieves form to search for products.
+    """
     query_params = get_query_params(request)
     filtered_products = ProductFilter(request.GET, queryset=Product.objects.filter(**query_params))
 
@@ -68,12 +62,18 @@ def retrieve_filter_form(request):
 
 
 def retrieve_categories(request):
+    """
+    Retrieves list of categories.
+    """
     categories_list = Category.objects.all()
 
     return {'categories': categories_list}
 
 
-def email_sub(request):
+def retrieve_email_sub_form(request):
+    """
+    Retrieves email subscription form.
+    """
     email_sub_form = EmailSubForm(request.POST)
     if request.method == 'POST' and 'email' in request.POST:
         if email_sub_form.is_valid():

@@ -4,6 +4,9 @@ from django.db import models
 
 
 class PostCategory(models.Model):
+    """
+    Model for post categories.
+    """
     name = models.CharField('Name', max_length=200, null=False)
     description = models.TextField('Description', default="")
 
@@ -17,6 +20,9 @@ class PostCategory(models.Model):
 
 
 class Post(models.Model):
+    """
+    Model for posts.
+    """
     author = models.CharField('Author', max_length=100, null=False)
     avatar = models.ImageField('Avatar', default='details-author.jpg')
     heading = models.CharField('Heading', max_length=200, null=False)

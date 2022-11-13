@@ -5,6 +5,9 @@ from .models import User, ShippingDetails, ProductReview, EmailSubscription, Con
 
 
 class CustomUserCreationForm(UserCreationForm):
+    """
+    Form for user registration.
+    """
     email = forms.EmailField()
 
     class Meta:
@@ -13,12 +16,19 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 class CheckoutForm(forms.ModelForm):
+    """
+    Form for checkout.
+    """
+
     class Meta:
         model = ShippingDetails
         fields = ('address', 'city', 'state', 'zipcode', 'payment_type')
 
 
 class ReviewForm(forms.ModelForm):
+    """
+    Form for reviews.
+    """
     rating = forms.FloatField(required=False)
 
     class Meta:
@@ -27,6 +37,9 @@ class ReviewForm(forms.ModelForm):
 
 
 class EmailSubForm(forms.ModelForm):
+    """
+    Form for email subscription.
+    """
     email = forms.EmailField()
 
     class Meta:
@@ -35,6 +48,9 @@ class EmailSubForm(forms.ModelForm):
 
 
 class ContactForm(forms.ModelForm):
+    """
+    Form for contact messages.
+    """
     contact_email = forms.EmailField(widget=forms.TextInput(attrs={'placeholder': 'Your email'}))
     name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Your name'}))
     message = forms.TextInput(attrs={'placeholder': 'Your message'})

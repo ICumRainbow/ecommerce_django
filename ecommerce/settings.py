@@ -76,7 +76,7 @@ TEMPLATES = [
                 'core.context_processors.retrieve_categories',
                 'core.context_processors.retrieve_filter_form',
                 'core.context_processors.retrieve_liked_products',
-                'core.context_processors.email_sub',
+                'core.context_processors.retrieve_email_sub_form',
             ],
         },
     },
