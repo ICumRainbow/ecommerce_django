@@ -2,7 +2,7 @@ from posts.filters import PostFilter
 from posts.models import PostCategory, Post
 
 
-def get_blog_page_contents(request_dict=None, query_params=None):
+def get_blog_page_contents(request_dict: dict = None, query_params: dict = None):
     """
     Getting all the contents for the Blog page.
     """
@@ -15,7 +15,7 @@ def get_blog_page_contents(request_dict=None, query_params=None):
     return categories, posts_by_date, posts
 
 
-def get_current_post_and_related_posts(id_):
+def get_current_post_and_related_posts(id_: int):
     """
     Getting current post and posts of the same category.
     """

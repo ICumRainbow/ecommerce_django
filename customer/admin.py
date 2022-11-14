@@ -5,34 +5,22 @@ from .models import User, Order, OrderItem, ShippingDetails, LikedProduct, Produ
     ContactMessage
 
 
-# admin.site.register(User)
-
-
-# admin.site.register(Order)
-# admin.site.register(OrderItem)
-# admin.site.register(ShippingDetails)
-# admin.site.register(LikedProduct)
-# admin.site.register(ProductReview)
-# admin.site.register(EmailSubscription)
-
-
-# admin.site.register(ContactMessage)
-
-
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     """
     Model to display users in admin panel.
     """
     list_display = ("username",)
+    search_fields = ("username",)
 
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     """
-    Model to display orders in admin panel
+    Model to display orders in admin panel.
     """
     list_display = ("id", "get_customer_username", "completed")
+    search_fields = ("customer_username", "id")
 
     @admin.display(description="Customer", ordering="customer")
     def get_customer_username(self, obj):
@@ -48,6 +36,7 @@ class OrderItemAdmin(admin.ModelAdmin):
     Model to display order items in admin panel.
     """
     list_display = ("get_product", "order", "get_customer_username")
+    search_fields = ("product_name", "customer_username")
 
     @admin.display(description="Customer", ordering="order__customer")
     def get_customer_username(self, obj):
@@ -70,6 +59,7 @@ class ShippingDetailsAdmin(admin.ModelAdmin):
     Model to display shipping details in admin panel.
     """
     list_display = ("customer", "payment_type", "state", "city", "address", "zipcode")
+    search_fields = ("customer__username", "state", "city", "address", "zipcode")
 
     @admin.display(empty_value="???", ordering="payment_type")
     def payment_type(self, obj):
@@ -86,6 +76,7 @@ class ContactMessageAdmin(admin.ModelAdmin):
     Model to display contact messages in admin panel.
     """
     list_display = ("get_name", "get_email")
+    search_fields = ("name",)
 
     @admin.display(description="Name", ordering="name")
     def get_name(self, obj):
@@ -102,6 +93,9 @@ class LikedProductAdmin(admin.ModelAdmin):
     Model to display liked products in admin panel.
     """
     list_display = ("customer_username", "product_name")
+    search_fields = ("product_name", "customer_username")
+
+    # autocomplete_fields = ("product",)
 
     @admin.display(description="Customer", ordering="customer")
     def customer_username(self, obj):
@@ -122,6 +116,7 @@ class ProductReviewAdmin(admin.ModelAdmin):
     Model to display product reviews in admin panel.
     """
     list_display = ("get_product", "rating", "get_customer")
+    search_fields = ("product__name", "rating", "customer__username")
 
     @admin.display(description="Product", ordering="product__name")
     def get_product(self, obj):
@@ -138,6 +133,7 @@ class EmailSubscriptionAdmin(admin.ModelAdmin):
     Model to display email subscriptions in admin panel.
     """
     list_display = ("get_email",)
+    search_fields = ("email",)
 
     @admin.display(ordering="email", empty_value="?")
     def get_email(self, obj):
