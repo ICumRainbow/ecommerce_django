@@ -4,6 +4,7 @@ from django.db.models import Sum, F
 from core.services import get_query_params, annotate_with_discount_prices
 from customer.forms import EmailSubForm
 from customer.models import Order, LikedProduct, OrderItem
+from posts.models import PostCategory
 from products.filters import ProductFilter
 from products.models import Category, Product
 
@@ -61,13 +62,21 @@ def retrieve_filter_form(request):
     return {'filtered_products': filtered_products}
 
 
-def retrieve_categories(request):
+def retrieve_product_categories(request):
     """
-    Retrieves list of categories.
+    Retrieves all product categories.
     """
-    categories_list = Category.objects.all()
+    categories = Category.objects.all()
 
-    return {'categories': categories_list}
+    return {'categories': categories}
+
+# def retrieve_post_categories(request):
+#     """
+#     Retrieves all post categories.
+#     """
+#     categories = PostCategory.objects.all()
+#
+#     return {'categories': categories}
 
 
 def retrieve_email_sub_form(request):

@@ -20,6 +20,9 @@ class Category(models.Model):
     def slugified_name(self):
         return ''.join(filter(str.isalnum, self.name))
 
+    def get_children(self):
+        return Product.objects.filter(category=self.id)
+
     def __str__(self):
         return self.name
 

@@ -73,7 +73,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.retrieve_cart_items',
-                'core.context_processors.retrieve_categories',
+                'core.context_processors.retrieve_product_categories',
                 'core.context_processors.retrieve_filter_form',
                 'core.context_processors.retrieve_liked_products',
                 'core.context_processors.retrieve_email_sub_form',

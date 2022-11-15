@@ -3,14 +3,19 @@ from collections import defaultdict
 from django.contrib import admin
 from django.db import models
 from django.db.models import Count, Avg, F, ExpressionWrapper
+from django.urls import reverse
 from django.utils.html import format_html
 
-from core.services import get_child_objects_with_links
+from core.services import get_link_tags, get_category_filter_link_tag
 from .models import Product, Category
 
 
 # admin.site.register(Product)
 # admin.site.register(Category)
+
+class ProductInlineAdmin(admin.StackedInline):
+    model = Product
+    classes = ("collapse",)
 
 
 @admin.register(Product)
@@ -25,14 +30,20 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ("category",)
     search_fields = ("name", "category__name", "price", "discount_price")
     autocomplete_fields = ("category",)
+    fieldsets = (
+        ('Main info', {
+            'fields': ('category', 'image', 'name', 'description', 'price', 'in_stock'),
+            'classes': ('collapse',)
+        }),
+        ('Discount info', {
+            'fields': ('discount', 'discount_rate'),
+            'classes': ('collapse',)
+        })
+    )
 
     @admin.display(description="Category", ordering="category__name")
     def get_category(self, obj):
-        url = (
-                "http://127.0.0.1:8000/admin/products/category/"
-                + str(obj.category.id)
-                + "/change/"
-        )
+        url = reverse(f"admin:{obj.category._meta.app_label}_{obj.category._meta.model_name}_change", kwargs={"object_id": obj.category.id})
         category = f'<a href="{url}">{obj.category}</a>'
         return format_html(category)
 
@@ -78,16 +89,14 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ("name", "get_products")
     list_filter = ("name",)
     search_fields = ("name",)
+    inlines = (ProductInlineAdmin,)
 
     @admin.display(description="Products")
     def get_products(self, obj, products=Product.objects.all()):
-        child_products_with_links = get_child_objects_with_links(queryset=products, obj=obj, products_=True)
-        if len(child_products_with_links) < 6:
-            return format_html(" ,&nbsp;&nbsp;".join(child_products_with_links))
+        link_tags = get_link_tags(obj=obj, queryset=products)
+        if len(link_tags) < 6:
+            return format_html(" ,&nbsp;&nbsp;".join(link_tags))
         else:
-            category_url = (
-                "http://127.0.0.1:8000/admin/products/product/?category__id__exact=" + str(obj.id)
-            )
-            category_link = f'<a href="{category_url}">{len(child_products_with_links)}</a>'
-            first_five_child_products = " ,&nbsp;&nbsp;".join(child_products_with_links[:5])
-            return format_html(first_five_child_products + f"...({category_link})")
+            tag = get_category_filter_link_tag(products.first(), obj.id, len(link_tags))
+            sliced_link_tags = " ,&nbsp;&nbsp;".join(link_tags[:3])
+            return format_html(sliced_link_tags + f"...({tag})")
