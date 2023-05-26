@@ -69,7 +69,7 @@ sqlparse==0.4.2
 style==1.1.0
 Telethon==1.24.0
 tenacity==8.0.1
-tornado==6.2
+tornado==6.3.2
 tqdm==4.64.0
 translate==3.6.1
 trio==0.21.0
